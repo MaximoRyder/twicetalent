@@ -28,7 +28,7 @@ const VideoSection = () => {
         >
           <div className="relative w-full aspect-video bg-secondary overflow-hidden">
             <iframe
-              src="https://www.youtube.com/embed/pjKz32Actd0?rel=0&modestbranding=1&v=2"
+              src={`https://www.youtube-nocookie.com/embed/pjKz32Actd0?rel=0&modestbranding=1&t=${Date.now()}`}
               title="Twice Talent — Once is luck. Twice is talent."
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
