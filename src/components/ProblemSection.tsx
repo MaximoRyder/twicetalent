@@ -1,16 +1,9 @@
 import { motion } from "framer-motion";
-import bgTexture from "@/assets/bg-texture-1.jpg";
 
 const ProblemSection = () => {
   return (
-    <section className="relative tt-section overflow-hidden">
-      <img
-        src={bgTexture}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
-        loading="lazy"
-      />
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
+    <section className="tt-section">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
         <motion.div
           className="md:col-span-5"
           initial={{ opacity: 0, x: -40 }}

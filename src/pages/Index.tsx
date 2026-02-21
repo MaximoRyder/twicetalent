@@ -4,10 +4,10 @@ import ProblemSection from "@/components/ProblemSection";
 import PromiseSection from "@/components/PromiseSection";
 import PipelineSection from "@/components/PipelineSection";
 import MethodSection from "@/components/MethodSection";
-import VideoSection from "@/components/VideoSection";
 import NotForEveryoneSection from "@/components/NotForEveryoneSection";
 import PackagesSection from "@/components/PackagesSection";
 import FinalCTASection from "@/components/FinalCTASection";
+import VideoSection from "@/components/VideoSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -19,10 +19,10 @@ const Index = () => {
       <PromiseSection />
       <PipelineSection />
       <MethodSection />
-      <VideoSection />
       <NotForEveryoneSection />
       <PackagesSection />
       <FinalCTASection />
+      <VideoSection />
       <Footer />
     </main>
   );
