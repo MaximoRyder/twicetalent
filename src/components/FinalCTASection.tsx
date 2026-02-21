@@ -1,24 +1,36 @@
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { motion } from "framer-motion";
 
 const FinalCTASection = () => {
-  const ref = useScrollReveal();
-
   return (
     <section id="contact" className="tt-section border-t border-border">
-      <div ref={ref} className="tt-fade-up max-w-3xl">
-        <p className="tt-label mb-4">Siguiente Paso</p>
-        <h2 className="tt-headline-lg text-foreground mb-8">
-          Dejá de adivinar.
-          <br />
-          Empezá a aprender.
-        </h2>
-        <p className="tt-body mb-12">
-          En 30 minutos te vas con hipótesis claras, el primer experimento
-          definido y los próximos 7 días planificados.
-        </p>
-        <a href="#" className="tt-btn-primary">
-          Agendar Llamada Diagnóstica
-        </a>
+      <div className="max-w-3xl">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <p className="tt-label mb-4">Siguiente Paso</p>
+          <h2 className="tt-headline-lg text-foreground mb-8">
+            Dejá de adivinar.
+            <br />
+            Empezá a aprender.
+          </h2>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <p className="tt-body mb-12">
+            En 30 minutos te vas con hipótesis claras, el primer experimento
+            definido y los próximos 7 días planificados.
+          </p>
+          <a href="#" className="tt-btn-primary">
+            Agendar Llamada Diagnóstica
+          </a>
+        </motion.div>
       </div>
     </section>
   );

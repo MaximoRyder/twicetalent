@@ -1,4 +1,5 @@
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { motion } from "framer-motion";
+import bgTexture from "@/assets/bg-texture-1.jpg";
 
 const packages = [
   {
@@ -19,21 +20,36 @@ const packages = [
 ];
 
 const PackagesSection = () => {
-  const ref = useScrollReveal();
-
   return (
-    <section className="tt-section border-t border-border">
-      <div ref={ref} className="tt-fade-up">
-        <p className="tt-label mb-4">Paquetes</p>
-        <h2 className="tt-headline-lg text-foreground max-w-3xl mb-16 md:mb-24">
-          Tres caminos. Un sistema.
-        </h2>
+    <section className="relative tt-section border-t border-border overflow-hidden">
+      <img
+        src={bgTexture}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
+        loading="lazy"
+      />
+      <div className="relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <p className="tt-label mb-4">Paquetes</p>
+          <h2 className="tt-headline-lg text-foreground max-w-3xl mb-16 md:mb-24">
+            Tres caminos. Un sistema.
+          </h2>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
-          {packages.map((pkg) => (
-            <div
+          {packages.map((pkg, i) => (
+            <motion.div
               key={pkg.name}
-              className="bg-background p-8 md:p-12 flex flex-col justify-between min-h-[280px]"
+              className="bg-background/80 backdrop-blur-sm p-8 md:p-12 flex flex-col justify-between min-h-[280px]"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
             >
               <div>
                 <h3 className="tt-headline-md text-foreground mb-2">
@@ -42,7 +58,7 @@ const PackagesSection = () => {
                 <p className="tt-label text-accent mb-6">{pkg.range}</p>
               </div>
               <p className="tt-body">{pkg.desc}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
