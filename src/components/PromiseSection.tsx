@@ -27,8 +27,8 @@ const PromiseSection = () => {
         >
           <p className="tt-body">
             Equivocarse no es el problema. El problema es hacerlo tarde, caro y
-            sin aprender nada. Acá trabajamos en ciclos cortos con entregables
-            reales. Si algo no funciona, lo sabés rápido y ajustás.
+            sin aprender nada. Aquí trabajamos en ciclos cortos con entregables
+            reales. Si algo no funciona, lo sabes rápido y ajustas.
           </p>
         </motion.div>
       </div>
