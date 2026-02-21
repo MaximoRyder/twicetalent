@@ -11,36 +11,53 @@ const NetworkBackground = () => {
     if (!ctx) return;
 
     let animationId: number;
-    let nodes: { x: number; y: number; vx: number; vy: number }[] = [];
+    let nodes: { x: number; y: number; vx: number; vy: number; baseVx: number; baseVy: number }[] = [];
+    let scrollY = 0;
+    let prevScrollY = 0;
+    let scrollVelocity = 0;
 
     const resize = () => {
       canvas.width = window.innerWidth;
-      canvas.height = document.documentElement.scrollHeight;
+      canvas.height = window.innerHeight;
       generateNodes();
     };
 
     const generateNodes = () => {
       const area = canvas.width * canvas.height;
-      const count = Math.floor(area / 45000); // sparse
-      nodes = Array.from({ length: count }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.15,
-        vy: (Math.random() - 0.5) * 0.15,
-      }));
+      const count = Math.floor(area / 25000);
+      nodes = Array.from({ length: count }, () => {
+        const vx = (Math.random() - 0.5) * 0.4;
+        const vy = (Math.random() - 0.5) * 0.4;
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx, vy,
+          baseVx: vx,
+          baseVy: vy,
+        };
+      });
     };
 
     const maxDist = 180;
 
     const draw = () => {
+      // Track scroll velocity
+      scrollY = window.scrollY;
+      scrollVelocity = (scrollY - prevScrollY) * 0.15;
+      prevScrollY = scrollY;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Update positions
+      // Update positions — inject scroll energy
       for (const node of nodes) {
+        node.vy = node.baseVy + scrollVelocity;
         node.x += node.vx;
         node.y += node.vy;
-        if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
-        if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+        // Wrap around edges instead of bouncing for fluid feel
+        if (node.x < 0) node.x = canvas.width;
+        if (node.x > canvas.width) node.x = 0;
+        if (node.y < 0) node.y = canvas.height;
+        if (node.y > canvas.height) node.y = 0;
       }
 
       // Draw connections
@@ -77,16 +94,9 @@ const NetworkBackground = () => {
 
     window.addEventListener("resize", resize);
 
-    // Re-measure height periodically in case content changes
-    const resizeObserver = new ResizeObserver(() => {
-      canvas.height = document.documentElement.scrollHeight;
-    });
-    resizeObserver.observe(document.documentElement);
-
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", resize);
-      resizeObserver.disconnect();
     };
   }, []);
 
