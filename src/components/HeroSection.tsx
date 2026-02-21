@@ -4,7 +4,6 @@ import heroVideo from "@/assets/hero-video.mp4";
 const HeroSection = () => {
   return (
     <section className="relative h-screen w-full overflow-hidden flex items-end">
-      {/* Video background */}
       <video
         autoPlay
         loop
@@ -15,10 +14,8 @@ const HeroSection = () => {
         <source src={heroVideo} type="video/mp4" />
       </video>
 
-      {/* Overlay */}
       <div className="absolute inset-0 bg-background/70" />
 
-      {/* Content */}
       <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 xl:px-32 pb-16 md:pb-24 lg:pb-32">
         <motion.p
           initial={{ opacity: 0 }}
@@ -26,7 +23,7 @@ const HeroSection = () => {
           transition={{ duration: 1, delay: 0.2 }}
           className="tt-label mb-6 text-muted-foreground"
         >
-          Estudio de Ejecución
+          Laboratorio de Ejecución
         </motion.p>
 
         <motion.h1
@@ -46,8 +43,8 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="tt-body max-w-2xl mt-8 mb-12"
         >
-          Twice Talent es un laboratorio para construir y lanzar ideas de principio a fin
-          — con ejecución estructurada.
+          Tenés una idea. Acá te ayudamos a construirla, validarla y lanzarla.
+          Sin rodeos. Con método.
         </motion.p>
 
         <motion.div

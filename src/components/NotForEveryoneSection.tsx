@@ -11,7 +11,7 @@ const NotForEveryoneSection = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="tt-label mb-4">Barreras de Entrada</p>
+          <p className="tt-label mb-4">Honestidad</p>
           <h2 className="tt-headline-lg text-foreground">No es para todos.</h2>
         </motion.div>
         <motion.div
@@ -23,13 +23,13 @@ const NotForEveryoneSection = () => {
         >
           <ul className="space-y-4">
             <li className="tt-body border-l-2 border-accent pl-6">
-              No construimos MVPs grandes sin validación.
+              No construimos MVPs enormes sin validar primero.
             </li>
             <li className="tt-body border-l-2 border-accent pl-6">
               No decimos que sí a todo. Optimizamos para resultados.
             </li>
             <li className="tt-body border-l-2 border-accent pl-6">
-              Si no vas a medir y cambiar, esto no funciona.
+              Si no estás dispuesto a medir y cambiar, esto no es para vos.
             </li>
           </ul>
         </motion.div>

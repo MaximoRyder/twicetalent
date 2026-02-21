@@ -6,17 +6,17 @@ const PackagesSection = () => {
     {
       name: "Starter",
       range: "Idea → Validación",
-      desc: "Definir hipótesis, testear supuestos y decidir si la idea vale la pena construirse.",
+      desc: "Definimos hipótesis, testeamos supuestos y decidimos juntos si vale la pena construir.",
     },
     {
       name: "Build",
       range: "Validación → MVP",
-      desc: "Diseñar, desarrollar y lanzar un producto enfocado en aprender — no en impresionar.",
+      desc: "Diseñamos, desarrollamos y lanzamos un producto enfocado en aprender, no en impresionar.",
     },
     {
       name: "Launch",
       range: "MVP → Go-to-market",
-      desc: "Preparar para el mercado, refinar narrativa y posicionar para inversores o primer revenue.",
+      desc: "Te preparamos para el mercado, afinamos la narrativa y te posicionamos frente a inversores.",
     },
   ];
 
