@@ -25,14 +25,14 @@ const itemVariants = {
 
 const PipelineSection = () => {
   return (
-    <section id="process" className="tt-section border-t border-border">
+    <section id="process" className="tt-section border-t border-accent/20">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
-        <p className="tt-label mb-4">Tu idea, de punta a punta</p>
+        <p className="tt-label mb-4 text-accent">Tu idea, de punta a punta</p>
         <h2 className="tt-headline-lg text-foreground max-w-3xl mb-16 md:mb-24">
           De la idea al lanzamiento. Todo el camino.
         </h2>

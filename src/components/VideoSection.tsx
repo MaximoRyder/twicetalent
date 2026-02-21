@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const VideoSection = () => {
   return (
-    <section className="px-6 md:px-12 lg:px-20 xl:px-32 py-16 border-t border-border">
+    <section className="px-6 md:px-12 lg:px-20 xl:px-32 py-16 border-t border-accent/20">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
         <motion.div
           className="md:col-span-5"
@@ -11,7 +11,7 @@ const VideoSection = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="tt-label mb-4 text-muted-foreground">Once is luck. Twice is talent.</p>
+          <p className="tt-label mb-4 text-accent">Once is luck. Twice is talent.</p>
           <h2 className="tt-headline-lg text-foreground">
             Una es suerte.
             <br />

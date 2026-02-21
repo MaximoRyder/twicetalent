@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const FinalCTASection = () => {
   return (
-    <section id="contact" className="tt-section border-t border-border">
+    <section id="contact" className="tt-section border-t border-accent/20">
       <div className="max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -10,7 +10,7 @@ const FinalCTASection = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="tt-label mb-4">Siguiente Paso</p>
+          <p className="tt-label mb-4 text-accent">Siguiente Paso</p>
           <h2 className="tt-headline-lg text-foreground mb-8">
             Deja de adivinar.
             <br />
