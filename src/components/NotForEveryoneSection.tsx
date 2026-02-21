@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const NotForEveryoneSection = () => {
   return (
-    <section className="tt-section border-t border-border">
+    <section className="tt-section border-t border-accent/20">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
         <motion.div
           className="md:col-span-5"
@@ -11,7 +11,7 @@ const NotForEveryoneSection = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="tt-label mb-4">Honestidad</p>
+          <p className="tt-label mb-4 text-accent">Honestidad</p>
           <h2 className="tt-headline-lg text-foreground">No es para todos.</h2>
         </motion.div>
         <motion.div
