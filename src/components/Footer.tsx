@@ -8,7 +8,7 @@ const Footer = () => {
         <span className="tt-label text-muted-foreground">Twice Talent</span>
       </div>
       <p className="text-xs text-muted-foreground tracking-wide">
-        © {new Date().getFullYear()} Twice Talent. All rights reserved.
+        © {new Date().getFullYear()} Twice Talent. Todos los derechos reservados.
       </p>
     </footer>
   );

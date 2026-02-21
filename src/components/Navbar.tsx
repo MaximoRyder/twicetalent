@@ -10,7 +10,7 @@ const Navbar = () => {
         </span>
       </a>
       <a href="#contact" className="tt-btn-secondary text-xs py-3 px-6">
-        Book a Call
+        Agendar Llamada
       </a>
     </nav>
   );
