@@ -11,11 +11,11 @@ const PromiseSection = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="tt-label mb-4">La Promesa</p>
+          <p className="tt-label mb-4">Lo que hacemos</p>
           <h2 className="tt-headline-lg text-foreground">
-            Fallar no es el enemigo.
+            Te ayudamos a equivocarte
             <br />
-            Aprender tarde, sí.
+            rápido, barato y con método.
           </h2>
         </motion.div>
         <motion.div
@@ -26,8 +26,9 @@ const PromiseSection = () => {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <p className="tt-body">
-            Ayudamos a founders a equivocarse antes — más barato — con método.
-            Ciclos cortos. Entregables reales. Decisiones basadas en evidencia.
+            Equivocarse no es el problema. El problema es hacerlo tarde, caro y
+            sin aprender nada. Acá trabajamos en ciclos cortos con entregables
+            reales. Si algo no funciona, lo sabés rápido y ajustás.
           </p>
         </motion.div>
       </div>

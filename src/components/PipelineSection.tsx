@@ -32,9 +32,9 @@ const PipelineSection = () => {
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
-        <p className="tt-label mb-4">Laboratorio de Ideas End-to-End</p>
+        <p className="tt-label mb-4">Tu idea, de punta a punta</p>
         <h2 className="tt-headline-lg text-foreground max-w-3xl mb-16 md:mb-24">
-          De la idea al lanzamiento — de principio a fin.
+          De la idea al lanzamiento. Todo el camino.
         </h2>
       </motion.div>
 

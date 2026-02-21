@@ -26,9 +26,9 @@ const ProblemSection = () => {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <p className="tt-body">
-            La mayoría de los proyectos no fallan por falta de esfuerzo. Fallan
-            por validación tardía, presupuesto desperdiciado y construir lo
-            incorrecto.
+            La mayoría de los proyectos no fallan porque el equipo no labure.
+            Fallan porque validan tarde, gastan de más y construyen algo que
+            nadie necesitaba.
           </p>
         </motion.div>
       </div>

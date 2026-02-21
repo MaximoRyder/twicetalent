@@ -22,7 +22,7 @@ const MethodSection = () => {
           <h2 className="tt-headline-lg text-foreground">
             Ciclos cortos.
             <br />
-            Ejecución estructurada.
+            Decisiones claras.
           </h2>
         </motion.div>
         <motion.div
@@ -33,8 +33,8 @@ const MethodSection = () => {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <p className="tt-body">
-            Cada ciclo termina con un entregable y una decisión: continuar,
-            ajustar o descartar.
+            Cada ciclo termina con algo concreto y una pregunta simple:
+            ¿seguimos, ajustamos o descartamos? Sin vueltas.
           </p>
         </motion.div>
       </div>
