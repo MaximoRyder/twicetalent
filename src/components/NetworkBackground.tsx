@@ -50,7 +50,7 @@ const NetworkBackground = () => {
           const dy = nodes[i].y - nodes[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < maxDist) {
-            const opacity = (1 - dist / maxDist) * 0.12;
+            const opacity = (1 - dist / maxDist) * 0.35;
             ctx.strokeStyle = `rgba(235, 235, 235, ${opacity})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
@@ -63,7 +63,7 @@ const NetworkBackground = () => {
 
       // Draw nodes
       for (const node of nodes) {
-        ctx.fillStyle = "rgba(235, 235, 235, 0.08)";
+        ctx.fillStyle = "rgba(235, 235, 235, 0.25)";
         ctx.beginPath();
         ctx.arc(node.x, node.y, 1.5, 0, Math.PI * 2);
         ctx.fill();
@@ -94,7 +94,7 @@ const NetworkBackground = () => {
     <canvas
       ref={canvasRef}
       className="pointer-events-none fixed inset-0 z-0"
-      style={{ opacity: 0.5 }}
+      style={{ opacity: 0.8 }}
     />
   );
 };
