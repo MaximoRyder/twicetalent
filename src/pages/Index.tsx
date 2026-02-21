@@ -9,10 +9,13 @@ import PackagesSection from "@/components/PackagesSection";
 import FinalCTASection from "@/components/FinalCTASection";
 import VideoSection from "@/components/VideoSection";
 import Footer from "@/components/Footer";
+import NetworkBackground from "@/components/NetworkBackground";
 
 const Index = () => {
   return (
-    <main>
+    <main className="relative">
+      <NetworkBackground />
+      <div className="relative z-10">
       <Navbar />
       <HeroSection />
       <ProblemSection />
@@ -24,6 +27,7 @@ const Index = () => {
       <FinalCTASection />
       <VideoSection />
       <Footer />
+      </div>
     </main>
   );
 };

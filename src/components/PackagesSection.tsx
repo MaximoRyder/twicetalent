@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import bgTexture from "@/assets/bg-texture-3.jpg";
 
 const PackagesSection = () => {
   const packages = [
@@ -21,14 +20,8 @@ const PackagesSection = () => {
   ];
 
   return (
-    <section className="relative tt-section border-t border-border overflow-hidden">
-      <img
-        src={bgTexture}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none"
-        loading="lazy"
-      />
-      <div className="relative z-10">
+    <section className="tt-section border-t border-border">
+      <div>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
