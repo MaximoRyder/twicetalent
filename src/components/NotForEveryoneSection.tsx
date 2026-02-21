@@ -29,7 +29,7 @@ const NotForEveryoneSection = () => {
               No decimos que sí a todo. Optimizamos para resultados.
             </li>
             <li className="tt-body border-l-2 border-accent pl-6">
-              Si no estás dispuesto a medir y cambiar, esto no es para vos.
+              Si no estás dispuesto a medir y cambiar, esto no es para ti.
             </li>
           </ul>
         </motion.div>

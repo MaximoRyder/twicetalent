@@ -43,7 +43,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="tt-body max-w-2xl mt-8 mb-12"
         >
-          Tenés una idea. Acá te ayudamos a construirla, validarla y lanzarla.
+          Tienes una idea. Aquí te ayudamos a construirla, validarla y lanzarla.
           Sin rodeos. Con método.
         </motion.p>
 

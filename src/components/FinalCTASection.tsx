@@ -12,9 +12,9 @@ const FinalCTASection = () => {
         >
           <p className="tt-label mb-4">Siguiente Paso</p>
           <h2 className="tt-headline-lg text-foreground mb-8">
-            Dejá de adivinar.
+            Deja de adivinar.
             <br />
-            Empezá a aprender.
+            Empieza a aprender.
           </h2>
         </motion.div>
         <motion.div
@@ -24,7 +24,7 @@ const FinalCTASection = () => {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <p className="tt-body mb-12">
-            En 30 minutos te vas con hipótesis claras, el primer experimento
+            En 30 minutos sales con hipótesis claras, el primer experimento
             definido y los próximos 7 días planificados.
           </p>
           <a href="#" className="tt-btn-primary">
