@@ -24,7 +24,7 @@
     --muted: 0 0% 14%;
     --muted-foreground: 0 0% 50%;
 
-    --accent: 270 50% 40%;
+    --accent: 270 60% 55%;
     --accent-foreground: 0 0% 92%;
 
     --destructive: 0 62.8% 30.6%;
@@ -48,8 +48,8 @@
     /* Custom tokens */
     --tt-charcoal: 0 0% 8%;
     --tt-neutral: 0 0% 50%;
-    --tt-violet: 270 50% 40%;
-    --tt-violet-soft: 270 30% 22%;
+    --tt-violet: 270 60% 55%;
+    --tt-violet-soft: 270 35% 30%;
     --tt-line: 0 0% 18%;
   }
 }
