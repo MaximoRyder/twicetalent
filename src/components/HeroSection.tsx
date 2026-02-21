@@ -26,7 +26,7 @@ const HeroSection = () => {
           transition={{ duration: 1, delay: 0.2 }}
           className="tt-label mb-6 text-muted-foreground"
         >
-          Execution Studio
+          Estudio de Ejecución
         </motion.p>
 
         <motion.h1
@@ -46,8 +46,8 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="tt-body max-w-2xl mt-8 mb-12"
         >
-          Twice Talent is a laboratory for building and launching ideas end-to-end
-          — with structured execution.
+          Twice Talent es un laboratorio para construir y lanzar ideas de principio a fin
+          — con ejecución estructurada.
         </motion.p>
 
         <motion.div
@@ -57,10 +57,10 @@ const HeroSection = () => {
           className="flex flex-col sm:flex-row gap-4"
         >
           <a href="#contact" className="tt-btn-primary">
-            Book a Diagnostic Call
+            Agendar Llamada Diagnóstica
           </a>
           <a href="#process" className="tt-btn-secondary">
-            See the Process
+            Ver el Proceso
           </a>
         </motion.div>
       </div>

@@ -3,18 +3,18 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 const packages = [
   {
     name: "Starter",
-    range: "Idea → Validation",
-    desc: "Define hypotheses, test assumptions, and decide if the idea is worth building.",
+    range: "Idea → Validación",
+    desc: "Definir hipótesis, testear supuestos y decidir si la idea vale la pena construirse.",
   },
   {
     name: "Build",
-    range: "Validation → MVP",
-    desc: "Design, develop, and ship a focused product built to learn — not to impress.",
+    range: "Validación → MVP",
+    desc: "Diseñar, desarrollar y lanzar un producto enfocado en aprender — no en impresionar.",
   },
   {
     name: "Launch",
     range: "MVP → Go-to-market",
-    desc: "Prepare for market, refine narrative, and position for investors or first revenue.",
+    desc: "Preparar para el mercado, refinar narrativa y posicionar para inversores o primer revenue.",
   },
 ];
 
@@ -24,9 +24,9 @@ const PackagesSection = () => {
   return (
     <section className="tt-section border-t border-border">
       <div ref={ref} className="tt-fade-up">
-        <p className="tt-label mb-4">Packages</p>
+        <p className="tt-label mb-4">Paquetes</p>
         <h2 className="tt-headline-lg text-foreground max-w-3xl mb-16 md:mb-24">
-          Three paths. One system.
+          Tres caminos. Un sistema.
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
