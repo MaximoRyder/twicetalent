@@ -1,31 +1,31 @@
 import { motion } from "framer-motion";
-import bgTexture from "@/assets/bg-texture-1.jpg";
-
-const packages = [
-  {
-    name: "Starter",
-    range: "Idea → Validación",
-    desc: "Definir hipótesis, testear supuestos y decidir si la idea vale la pena construirse.",
-  },
-  {
-    name: "Build",
-    range: "Validación → MVP",
-    desc: "Diseñar, desarrollar y lanzar un producto enfocado en aprender — no en impresionar.",
-  },
-  {
-    name: "Launch",
-    range: "MVP → Go-to-market",
-    desc: "Preparar para el mercado, refinar narrativa y posicionar para inversores o primer revenue.",
-  },
-];
+import bgTexture from "@/assets/bg-texture-3.jpg";
 
 const PackagesSection = () => {
+  const packages = [
+    {
+      name: "Starter",
+      range: "Idea → Validación",
+      desc: "Definir hipótesis, testear supuestos y decidir si la idea vale la pena construirse.",
+    },
+    {
+      name: "Build",
+      range: "Validación → MVP",
+      desc: "Diseñar, desarrollar y lanzar un producto enfocado en aprender — no en impresionar.",
+    },
+    {
+      name: "Launch",
+      range: "MVP → Go-to-market",
+      desc: "Preparar para el mercado, refinar narrativa y posicionar para inversores o primer revenue.",
+    },
+  ];
+
   return (
     <section className="relative tt-section border-t border-border overflow-hidden">
       <img
         src={bgTexture}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none"
         loading="lazy"
       />
       <div className="relative z-10">
