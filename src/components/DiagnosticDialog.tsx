@@ -90,7 +90,53 @@ const questions: Question[] = [
 ];
 
 /* ─── Helpers ─── */
-const getLevel = (v: number): string => {
+const contextualLevels: Record<string, string[]> = {
+  clarity: [
+    "Explorando la idea",
+    "Conociendo el contexto",
+    "Tomando forma",
+    "Bien definido",
+    "Cristalino",
+  ],
+  validation: [
+    "Sin datos aún",
+    "Primeras señales",
+    "Evidencia parcial",
+    "Mercado responde",
+    "Demanda confirmada",
+  ],
+  execution: [
+    "Armando el equipo",
+    "Primeros pasos",
+    "En construcción",
+    "Equipo sólido",
+    "Máquina de ejecución",
+  ],
+  technical: [
+    "En la pizarra",
+    "Prototipo inicial",
+    "Producto en desarrollo",
+    "Producto funcional",
+    "Listo para escalar",
+  ],
+  urgency: [
+    "Sin prisa",
+    "Puede esperar",
+    "Pronto sería ideal",
+    "El reloj corre",
+    "Ayer era tarde",
+  ],
+};
+
+const getLevel = (v: number, questionId?: string): string => {
+  if (questionId && contextualLevels[questionId]) {
+    const levels = contextualLevels[questionId];
+    if (v >= 80) return levels[4];
+    if (v >= 60) return levels[3];
+    if (v >= 40) return levels[2];
+    if (v >= 20) return levels[1];
+    return levels[0];
+  }
   if (v >= 80) return "Muy alto";
   if (v >= 60) return "Alto";
   if (v >= 40) return "Medio";
@@ -344,7 +390,7 @@ const SliderInput = ({
 }: {
   question: SliderQuestion; value: number; onChange: (v: number) => void; answered: boolean;
 }) => {
-  const level = getLevel(value);
+  const level = getLevel(value, question.id);
   return (
     <div>
       <div className="flex items-start justify-between mb-1">
