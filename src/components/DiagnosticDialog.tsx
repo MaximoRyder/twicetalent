@@ -195,7 +195,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border p-0 gap-0">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border p-0 gap-0 [&>button]:z-20 [&>button]:top-5 [&>button]:right-6">
         <DialogTitle className="sr-only">Diagnóstico Estratégico</DialogTitle>
 
         {/* Header */}
