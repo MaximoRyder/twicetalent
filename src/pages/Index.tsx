@@ -9,6 +9,7 @@ import MethodSection from "@/components/MethodSection";
 import NotForEveryoneSection from "@/components/NotForEveryoneSection";
 import PackagesSection from "@/components/PackagesSection";
 import FinalCTASection from "@/components/FinalCTASection";
+import DiagnosticSection from "@/components/DiagnosticSection";
 import VideoSection from "@/components/VideoSection";
 import Footer from "@/components/Footer";
 import NetworkBackground from "@/components/NetworkBackground";
@@ -34,6 +35,7 @@ const Index = () => {
         <NotForEveryoneSection />
         <PackagesSection />
         <FinalCTASection />
+        <DiagnosticSection />
         <VideoSection />
         <Footer />
       </div>

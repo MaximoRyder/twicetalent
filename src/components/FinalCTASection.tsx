@@ -27,8 +27,8 @@ const FinalCTASection = () => {
             En 30 minutos sales con hipótesis claras, el primer experimento
             definido y los próximos 7 días planificados.
           </p>
-          <a href="#" className="tt-btn-primary">
-            Agendar Llamada Diagnóstica
+          <a href="#diagnostic" className="tt-btn-primary">
+            Cuéntame y Conversemos
           </a>
         </motion.div>
       </div>

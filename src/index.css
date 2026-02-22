@@ -145,4 +145,52 @@
     opacity: 1;
     transform: translateY(0);
   }
+
+  /* Diagnostic slider */
+  .diagnostic-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: hsl(var(--secondary));
+    outline: none;
+    cursor: pointer;
+  }
+
+  .diagnostic-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: hsl(var(--accent));
+    border: 2px solid hsl(var(--accent));
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .diagnostic-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 12px hsl(var(--accent) / 0.4);
+  }
+
+  .diagnostic-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: hsl(var(--accent));
+    border: 2px solid hsl(var(--accent));
+    cursor: pointer;
+  }
+
+  .diagnostic-slider::-webkit-slider-runnable-track {
+    height: 6px;
+    background: linear-gradient(
+      to right,
+      hsl(var(--accent)) 0%,
+      hsl(var(--accent)) var(--val, 0%),
+      hsl(var(--secondary)) var(--val, 0%),
+      hsl(var(--secondary)) 100%
+    );
+  }
 }
