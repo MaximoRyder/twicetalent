@@ -201,8 +201,11 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border px-6 md:px-8 pr-14 py-5">
           <div className="flex items-center justify-between mb-1">
-            <p className="tt-label text-accent">Diagnóstico Estratégico</p>
             <div className="flex items-center gap-3">
+              <p className="tt-label text-accent">Diagnóstico Estratégico</p>
+              <span className="text-sm font-medium text-foreground font-['Space_Grotesk']">
+                {progress}%
+              </span>
               <AnimatePresence>
                 {autoSaved && (
                   <motion.span
@@ -216,9 +219,6 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
                   </motion.span>
                 )}
               </AnimatePresence>
-              <span className="text-sm font-medium text-foreground font-['Space_Grotesk']">
-                {progress}%
-              </span>
             </div>
           </div>
           <div className="w-full h-1 bg-secondary rounded-none overflow-hidden">
