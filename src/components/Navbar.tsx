@@ -9,8 +9,8 @@ const Navbar = () => {
           Twice Talent
         </span>
       </a>
-      <a href="#contact" className="tt-btn-secondary text-xs py-3 px-6">
-        Agendar Llamada
+      <a href="#diagnostic" className="tt-btn-secondary text-xs py-3 px-6">
+        Cuéntame y Conversemos
       </a>
     </nav>
   );

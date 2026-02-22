@@ -70,6 +70,13 @@ const questions: Question[] = [
     offLabel: "No",
   },
   {
+    type: "segment",
+    id: "budget",
+    label: "Presupuesto disponible",
+    description: "¿Con cuánto capital cuentas para invertir en este proyecto?",
+    options: ["< $5K", "$5K–$15K", "$15K–$50K", "> $50K"],
+  },
+  {
     type: "slider",
     id: "urgency",
     label: "Urgencia de lanzamiento",
@@ -244,7 +251,7 @@ const DiagnosticSection = () => {
                 onClick={() => setShowResults(true)}
                 className="tt-btn-primary"
               >
-                Ver mi diagnóstico
+                Enviar
               </button>
             </motion.div>
           )}
