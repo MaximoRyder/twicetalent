@@ -25,7 +25,7 @@ const FinalCTASection = () => {
         >
           <p className="tt-body mb-12">
             En 30 minutos sales con hipótesis claras, el primer experimento
-            definido y los próximos 7 días planificados.
+            definido y los próximos 7 días planificados. Completá el diagnóstico y conversemos.
           </p>
           <a href="#diagnostic" className="tt-btn-primary">
             Cuéntame y Conversemos

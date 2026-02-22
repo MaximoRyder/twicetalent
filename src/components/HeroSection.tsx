@@ -57,8 +57,8 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 1.1 }}
           className="flex flex-col sm:flex-row gap-4"
         >
-          <a href="#contact" className="tt-btn-primary">
-            Agendar Llamada Diagnóstica
+          <a href="#diagnostic" className="tt-btn-primary">
+            Cuéntame y Conversemos
           </a>
           <a href="#process" className="tt-btn-secondary">
             Ver el Proceso
