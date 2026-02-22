@@ -36,41 +36,34 @@ type Question = SliderQuestion | SegmentQuestion | ToggleQuestion;
 /* ─── Data ─── */
 const questions: Question[] = [
   {
-    type: "segment",
-    id: "stage",
-    label: "Etapa actual",
-    description: "¿En qué fase se encuentra tu proyecto?",
-    options: ["Idea", "MVP", "Tracción", "Escala"],
+    type: "slider",
+    id: "logo_brand",
+    label: "Logo y Redes Sociales",
+    description: "¿Tienes identidad visual y presencia en redes sociales?",
+  },
+  {
+    type: "slider",
+    id: "website",
+    label: "Página Web",
+    description: "¿Tienes un sitio web funcional para tu proyecto?",
   },
   {
     type: "slider",
     id: "clarity",
-    label: "Claridad del problema",
-    description: "¿Qué tan definido está el problema que resuelves?",
+    label: "Conocimiento del problema",
+    description: "¿Qué tan bien entiendes el problema que resuelves?",
   },
   {
     type: "slider",
     id: "validation",
-    label: "Validación de mercado",
+    label: "Validación del mercado",
     description: "¿Cuánta evidencia real tienes de que el mercado lo necesita?",
-  },
-  {
-    type: "slider",
-    id: "execution",
-    label: "Capacidad de ejecución",
-    description: "¿Qué tan preparado está tu equipo para ejecutar?",
-  },
-  {
-    type: "slider",
-    id: "technical",
-    label: "Madurez técnica",
-    description: "¿Qué tan avanzado está tu producto o prototipo?",
   },
   {
     type: "toggle",
     id: "funding",
     label: "Financiamiento",
-    description: "¿Cuentas con capital para los próximos 6 meses?",
+    description: "¿Cuentas con capital para invertir en este proyecto?",
     onLabel: "Sí",
     offLabel: "No",
   },
@@ -78,19 +71,33 @@ const questions: Question[] = [
     type: "segment",
     id: "budget",
     label: "Presupuesto disponible",
-    description: "¿Con cuánto capital cuentas para invertir en este proyecto?",
+    description: "¿Con cuánto capital cuentas para invertir?",
     options: ["< $5K", "$5K–$15K", "$15K–$50K", "> $50K"],
   },
   {
     type: "slider",
     id: "urgency",
-    label: "Urgencia de lanzamiento",
-    description: "¿Qué tan crítico es lanzar en los próximos 90 días?",
+    label: "Urgencia",
+    description: "¿Qué tan crítico es avanzar en los próximos 90 días?",
   },
 ];
 
 /* ─── Helpers ─── */
 const contextualLevels: Record<string, string[]> = {
+  logo_brand: [
+    "Sin identidad aún",
+    "Primeros bocetos",
+    "Identidad en desarrollo",
+    "Marca presente",
+    "Marca posicionada",
+  ],
+  website: [
+    "Sin sitio web",
+    "Landing básica",
+    "Sitio en construcción",
+    "Sitio funcional",
+    "Experiencia completa",
+  ],
   clarity: [
     "Explorando la idea",
     "Conociendo el contexto",
@@ -104,20 +111,6 @@ const contextualLevels: Record<string, string[]> = {
     "Evidencia parcial",
     "Mercado responde",
     "Demanda confirmada",
-  ],
-  execution: [
-    "Armando el equipo",
-    "Primeros pasos",
-    "En construcción",
-    "Equipo sólido",
-    "Máquina de ejecución",
-  ],
-  technical: [
-    "En la pizarra",
-    "Prototipo inicial",
-    "Producto en desarrollo",
-    "Producto funcional",
-    "Listo para escalar",
   ],
   urgency: [
     "Sin prisa",
@@ -179,14 +172,12 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   }, [answers]);
 
   const readinessScore = useMemo(() => {
-    const sliderIds = ["clarity", "validation", "execution", "technical", "urgency"];
+    const sliderIds = ["logo_brand", "website", "clarity", "validation", "urgency"];
     const sliderAvg =
       sliderIds.reduce((sum, id) => sum + (typeof answers[id] === "number" ? (answers[id] as number) : 0), 0) /
       sliderIds.length;
-    const stageBonus =
-      answers.stage === "Escala" ? 15 : answers.stage === "Tracción" ? 10 : answers.stage === "MVP" ? 5 : 0;
     const fundingBonus = answers.funding === true ? 10 : 0;
-    return Math.min(100, Math.round(sliderAvg * 0.75 + stageBonus + fundingBonus));
+    return Math.min(100, Math.round(sliderAvg * 0.9 + fundingBonus));
   }, [answers]);
 
   const canSubmit = progress === 100;
