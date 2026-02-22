@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 
-const FinalCTASection = () => {
+interface FinalCTASectionProps {
+  onDiagnosticClick: () => void;
+}
+
+const FinalCTASection = ({ onDiagnosticClick }: FinalCTASectionProps) => {
   return (
     <section id="contact" className="tt-section border-t border-accent/20">
       <div className="max-w-3xl">
@@ -27,9 +31,9 @@ const FinalCTASection = () => {
             En 30 minutos sales con hipótesis claras, el primer experimento
             definido y los próximos 7 días planificados. Completá el diagnóstico y conversemos.
           </p>
-          <a href="#diagnostic" className="tt-btn-primary">
+          <button onClick={onDiagnosticClick} className="tt-btn-primary">
             Cuéntame y Conversemos
-          </a>
+          </button>
         </motion.div>
       </div>
     </section>
