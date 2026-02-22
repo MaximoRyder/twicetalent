@@ -199,7 +199,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
         <DialogTitle className="sr-only">Diagnóstico Estratégico</DialogTitle>
 
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border px-6 md:px-8 py-5">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border px-6 md:px-8 pr-14 py-5">
           <div className="flex items-center justify-between mb-1">
             <p className="tt-label text-accent">Diagnóstico Estratégico</p>
             <div className="flex items-center gap-3">
