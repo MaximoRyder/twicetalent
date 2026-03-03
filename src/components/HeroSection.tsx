@@ -20,7 +20,7 @@ const HeroSection = ({ onDiagnosticClick }: HeroSectionProps) => {
           Once is luck.<br />Twice is talent.
         </motion.h1>
         <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.3 }} transition={{ duration: 0.8, delay: 0.8 }} className="tt-body max-w-2xl mt-8 mb-12">
-          Tienes una idea. Aquí te ayudamos a construirla, validarla y lanzarla. Sin rodeos. Con método.
+          Tienes una idea y nosotros el método para construirla, validarla y lanzarla sin rodeos.
         </motion.p>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.3 }} transition={{ duration: 0.8, delay: 1.1 }} className="flex flex-col sm:flex-row gap-4">
           <button onClick={onDiagnosticClick} className="tt-btn-primary">
