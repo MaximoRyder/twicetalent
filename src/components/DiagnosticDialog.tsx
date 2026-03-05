@@ -201,6 +201,11 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const handleSubmit = useCallback(async () => {
     setSubmitting(true);
     const { error } = await supabase.from("solicitudes").insert({
+      nombre: contact.nombre.trim(),
+      apellido: contact.apellido.trim(),
+      email: contact.email.trim(),
+      telefono: contact.telefono.trim(),
+      pais: contact.pais.trim(),
       logo_brand: typeof answers.logo_brand === "number" ? answers.logo_brand : 0,
       website: typeof answers.website === "number" ? answers.website : 0,
       clarity: typeof answers.clarity === "number" ? answers.clarity : 0,
@@ -217,7 +222,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
       setSubmitted(true);
       toast.success("¡Diagnóstico enviado con éxito!");
     }
-  }, [answers, readinessScore]);
+  }, [answers, contact, readinessScore]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
