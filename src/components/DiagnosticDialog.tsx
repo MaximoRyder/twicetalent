@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Dialog,
@@ -170,6 +170,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const resetAll = useCallback(() => {
     setAnswers({});
@@ -290,6 +291,9 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
     } else {
       setSubmitted(true);
       toast.success("¡Diagnóstico enviado con éxito!");
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
     }
   }, [answers, contact, readinessScore, canSubmit]);
 
@@ -570,6 +574,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
               </motion.div>
             )}
           </div>
+          <div ref={bottomRef} />
         </div>
       </DialogContent>
 
