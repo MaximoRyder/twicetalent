@@ -541,9 +541,6 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
               </motion.div>
             )}
           </AnimatePresence>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </DialogContent>
     </Dialog>
