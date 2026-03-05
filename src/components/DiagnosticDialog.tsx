@@ -188,6 +188,27 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const readiness = getReadinessLabel(readinessScore);
   const easing = [0.16, 1, 0.3, 1];
 
+  const handleSubmit = useCallback(async () => {
+    setSubmitting(true);
+    const { error } = await supabase.from("solicitudes").insert({
+      logo_brand: typeof answers.logo_brand === "number" ? answers.logo_brand : 0,
+      website: typeof answers.website === "number" ? answers.website : 0,
+      clarity: typeof answers.clarity === "number" ? answers.clarity : 0,
+      validation: typeof answers.validation === "number" ? answers.validation : 0,
+      funding: answers.funding === true,
+      budget: typeof answers.budget === "string" ? answers.budget : null,
+      urgency: typeof answers.urgency === "number" ? answers.urgency : 0,
+      readiness_score: readinessScore,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error("Hubo un error al enviar. Intenta de nuevo.");
+    } else {
+      setSubmitted(true);
+      toast.success("¡Diagnóstico enviado con éxito!");
+    }
+  }, [answers, readinessScore]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border p-0 gap-0 [&>button]:z-20 [&>button]:top-5 [&>button]:right-6">
