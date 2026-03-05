@@ -152,9 +152,20 @@ interface DiagnosticDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const LATAM_SPAIN_COUNTRIES = [
+  "Argentina", "Bolivia", "Brasil", "Chile", "Colombia", "Costa Rica", "Cuba",
+  "Ecuador", "El Salvador", "España", "Guatemala", "Honduras", "México",
+  "Nicaragua", "Panamá", "Paraguay", "Perú", "Puerto Rico",
+  "República Dominicana", "Uruguay", "Venezuela",
+];
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^\+?[\d\s\-()]{7,20}$/;
+
 const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [answers, setAnswers] = useState<Record<string, number | string | boolean>>({});
   const [contact, setContact] = useState({ nombre: "", apellido: "", email: "", telefono: "", pais: "" });
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [showResults, setShowResults] = useState(false);
   const [autoSaved, setAutoSaved] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -172,10 +183,40 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   }, []);
 
   const setContactField = useCallback((field: string, value: string) => {
-    setContact((prev) => ({ ...prev, [field]: value }));
+    if (field === "telefono") {
+      // Solo permitir números, +, espacios, guiones, paréntesis
+      const cleaned = value.replace(/[^\d+\s\-()]/g, "");
+      setContact((prev) => ({ ...prev, [field]: cleaned }));
+    } else if (field === "nombre" || field === "apellido") {
+      // Solo letras, espacios, acentos
+      const cleaned = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]/g, "");
+      setContact((prev) => ({ ...prev, [field]: cleaned }));
+    } else {
+      setContact((prev) => ({ ...prev, [field]: value }));
+    }
   }, []);
 
-  const contactComplete = contact.nombre.trim() !== "" && contact.apellido.trim() !== "" && contact.email.trim() !== "" && contact.telefono.trim() !== "" && contact.pais.trim() !== "";
+  const markTouched = useCallback((field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  }, []);
+
+  const errors = useMemo(() => {
+    const e: Record<string, string> = {};
+    if (touched.nombre && contact.nombre.trim().length < 2) e.nombre = "Mínimo 2 caracteres";
+    if (touched.apellido && contact.apellido.trim().length < 2) e.apellido = "Mínimo 2 caracteres";
+    if (touched.email && !EMAIL_REGEX.test(contact.email.trim())) e.email = "Email inválido";
+    if (touched.telefono && !PHONE_REGEX.test(contact.telefono.trim())) e.telefono = "Teléfono inválido";
+    if (touched.pais && contact.pais.trim() === "") e.pais = "Selecciona un país";
+    return e;
+  }, [contact, touched]);
+
+  const contactValid = contact.nombre.trim().length >= 2 &&
+    contact.apellido.trim().length >= 2 &&
+    EMAIL_REGEX.test(contact.email.trim()) &&
+    PHONE_REGEX.test(contact.telefono.trim()) &&
+    contact.pais.trim() !== "";
+
+  const contactComplete = contactValid;
 
   const progress = useMemo(() => {
     const questionsAnswered = questions.filter((q) => answers[q.id] !== undefined).length;
@@ -194,11 +235,13 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
     return Math.min(100, Math.round(sliderAvg * 0.9 + fundingBonus));
   }, [answers]);
 
-  const canSubmit = progress === 100 && contactComplete;
+  const allQuestionsAnswered = questions.every((q) => answers[q.id] !== undefined);
+  const canSubmit = allQuestionsAnswered && contactValid;
   const readiness = getReadinessLabel(readinessScore);
   const easing = [0.16, 1, 0.3, 1];
 
   const handleSubmit = useCallback(async () => {
+    if (!canSubmit) return;
     setSubmitting(true);
     const { error } = await supabase.from("solicitudes").insert({
       nombre: contact.nombre.trim(),
@@ -222,7 +265,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
       setSubmitted(true);
       toast.success("¡Diagnóstico enviado con éxito!");
     }
-  }, [answers, contact, readinessScore]);
+  }, [answers, contact, readinessScore, canSubmit]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -283,32 +326,79 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
               <span className="text-sm font-medium text-foreground font-['Space_Grotesk']">Tus datos de contacto</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {[
-                { key: "nombre", label: "Nombre", type: "text", placeholder: "Tu nombre" },
-                { key: "apellido", label: "Apellido", type: "text", placeholder: "Tu apellido" },
-                { key: "email", label: "Email", type: "email", placeholder: "tu@email.com" },
-                { key: "telefono", label: "Teléfono", type: "tel", placeholder: "+1 234 567 890" },
-              ].map((field) => (
-                <div key={field.key}>
-                  <label className="text-xs text-muted-foreground mb-1 block">{field.label}</label>
-                  <input
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    value={contact[field.key as keyof typeof contact]}
-                    onChange={(e) => setContactField(field.key, e.target.value)}
-                    className="w-full bg-background border border-border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
-                  />
-                </div>
-              ))}
-              <div className="md:col-span-2">
-                <label className="text-xs text-muted-foreground mb-1 block">País</label>
+              {/* Nombre */}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Nombre *</label>
                 <input
                   type="text"
-                  placeholder="Tu país"
+                  placeholder="Tu nombre"
+                  maxLength={40}
+                  value={contact.nombre}
+                  onChange={(e) => setContactField("nombre", e.target.value)}
+                  onBlur={() => markTouched("nombre")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.nombre ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.nombre && <p className="text-xs text-red-500 mt-1">{errors.nombre}</p>}
+              </div>
+              {/* Apellido */}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Apellido *</label>
+                <input
+                  type="text"
+                  placeholder="Tu apellido"
+                  maxLength={40}
+                  value={contact.apellido}
+                  onChange={(e) => setContactField("apellido", e.target.value)}
+                  onBlur={() => markTouched("apellido")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.apellido ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.apellido && <p className="text-xs text-red-500 mt-1">{errors.apellido}</p>}
+              </div>
+              {/* Email */}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Email *</label>
+                <input
+                  type="email"
+                  placeholder="tu@email.com"
+                  maxLength={100}
+                  value={contact.email}
+                  onChange={(e) => setContactField("email", e.target.value)}
+                  onBlur={() => markTouched("email")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.email ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+              </div>
+              {/* Teléfono */}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Teléfono *</label>
+                <input
+                  type="tel"
+                  placeholder="+54 11 1234 5678"
+                  maxLength={20}
+                  value={contact.telefono}
+                  onChange={(e) => setContactField("telefono", e.target.value)}
+                  onBlur={() => markTouched("telefono")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.telefono ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.telefono && <p className="text-xs text-red-500 mt-1">{errors.telefono}</p>}
+              </div>
+              {/* País */}
+              <div className="md:col-span-2">
+                <label className="text-xs text-muted-foreground mb-1 block">País *</label>
+                <select
                   value={contact.pais}
                   onChange={(e) => setContactField("pais", e.target.value)}
-                  className="w-full bg-background border border-border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
-                />
+                  onBlur={() => markTouched("pais")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] focus:outline-none transition-colors appearance-none ${
+                    contact.pais === "" ? "text-muted-foreground/50" : ""
+                  } ${errors.pais ? "border-red-500" : "border-border focus:border-accent"}`}
+                >
+                  <option value="" disabled>Selecciona tu país</option>
+                  {LATAM_SPAIN_COUNTRIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                {errors.pais && <p className="text-xs text-red-500 mt-1">{errors.pais}</p>}
               </div>
             </div>
           </motion.div>
@@ -349,29 +439,41 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
             ))}
           </div>
 
-          {/* Submit */}
-          <AnimatePresence>
-            {canSubmit && !showResults && (
-              <motion.div
-                className="mt-8 text-center"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, ease: easing }}
+          {/* CTA Submit */}
+          <div className="mt-8 text-center">
+            {!submitted ? (
+              <button
+                onClick={() => {
+                  if (!canSubmit) {
+                    // Mark all fields as touched to show errors
+                    ["nombre", "apellido", "email", "telefono", "pais"].forEach((f) => markTouched(f));
+                    toast.error("Completa todos los campos correctamente antes de enviar.");
+                    return;
+                  }
+                  handleSubmit();
+                }}
+                disabled={submitting}
+                className={`tt-btn-primary disabled:opacity-50 ${!canSubmit ? "opacity-60" : ""}`}
               >
-                <button
-                  onClick={() => setShowResults(true)}
-                  className="tt-btn-primary"
-                >
-                  Enviar información
-                </button>
+                {submitting ? "Enviando..." : "Enviar información"}
+              </button>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="py-4"
+              >
+                <p className="text-sm text-accent font-medium mb-2">✓ Información enviada con éxito</p>
+                <p className="text-xs text-muted-foreground">
+                  Recibirás una respuesta personalizada en menos de 24 horas.
+                </p>
               </motion.div>
             )}
-          </AnimatePresence>
+          </div>
 
           {/* Results */}
           <AnimatePresence>
-            {showResults && (
+            {submitted && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -436,33 +538,6 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
                     })}
                 </div>
 
-                {/* CTA */}
-                <div className="text-center pt-5 border-t border-border">
-                  {submitted ? (
-                    <div>
-                      <p className="text-sm text-accent font-medium mb-2">✓ Diagnóstico enviado</p>
-                      <p className="text-xs text-muted-foreground">
-                        Recibirás una respuesta personalizada en menos de 24 horas.
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        ¿Listo para convertir este diagnóstico en un plan de acción?
-                      </p>
-                      <button
-                        onClick={handleSubmit}
-                        disabled={submitting}
-                        className="tt-btn-primary disabled:opacity-50"
-                      >
-                        {submitting ? "Enviando..." : "Enviar información"}
-                      </button>
-                      <p className="text-xs text-muted-foreground mt-3">
-                        Recibirás una respuesta personalizada en menos de 24 horas.
-                      </p>
-                    </>
-                  )}
-                </div>
               </motion.div>
             )}
           </AnimatePresence>
