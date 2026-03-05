@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      solicitudes: {
+        Row: {
+          budget: string | null
+          clarity: number | null
+          created_at: string
+          funding: boolean | null
+          id: string
+          logo_brand: number | null
+          readiness_score: number | null
+          urgency: number | null
+          validation: number | null
+          website: number | null
+        }
+        Insert: {
+          budget?: string | null
+          clarity?: number | null
+          created_at?: string
+          funding?: boolean | null
+          id?: string
+          logo_brand?: number | null
+          readiness_score?: number | null
+          urgency?: number | null
+          validation?: number | null
+          website?: number | null
+        }
+        Update: {
+          budget?: string | null
+          clarity?: number | null
+          created_at?: string
+          funding?: boolean | null
+          id?: string
+          logo_brand?: number | null
+          readiness_score?: number | null
+          urgency?: number | null
+          validation?: number | null
+          website?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
