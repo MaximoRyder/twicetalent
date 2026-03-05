@@ -326,32 +326,79 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
               <span className="text-sm font-medium text-foreground font-['Space_Grotesk']">Tus datos de contacto</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {[
-                { key: "nombre", label: "Nombre", type: "text", placeholder: "Tu nombre" },
-                { key: "apellido", label: "Apellido", type: "text", placeholder: "Tu apellido" },
-                { key: "email", label: "Email", type: "email", placeholder: "tu@email.com" },
-                { key: "telefono", label: "Teléfono", type: "tel", placeholder: "+1 234 567 890" },
-              ].map((field) => (
-                <div key={field.key}>
-                  <label className="text-xs text-muted-foreground mb-1 block">{field.label}</label>
-                  <input
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    value={contact[field.key as keyof typeof contact]}
-                    onChange={(e) => setContactField(field.key, e.target.value)}
-                    className="w-full bg-background border border-border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
-                  />
-                </div>
-              ))}
-              <div className="md:col-span-2">
-                <label className="text-xs text-muted-foreground mb-1 block">País</label>
+              {/* Nombre */}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Nombre *</label>
                 <input
                   type="text"
-                  placeholder="Tu país"
+                  placeholder="Tu nombre"
+                  maxLength={40}
+                  value={contact.nombre}
+                  onChange={(e) => setContactField("nombre", e.target.value)}
+                  onBlur={() => markTouched("nombre")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.nombre ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.nombre && <p className="text-xs text-red-500 mt-1">{errors.nombre}</p>}
+              </div>
+              {/* Apellido */}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Apellido *</label>
+                <input
+                  type="text"
+                  placeholder="Tu apellido"
+                  maxLength={40}
+                  value={contact.apellido}
+                  onChange={(e) => setContactField("apellido", e.target.value)}
+                  onBlur={() => markTouched("apellido")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.apellido ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.apellido && <p className="text-xs text-red-500 mt-1">{errors.apellido}</p>}
+              </div>
+              {/* Email */}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Email *</label>
+                <input
+                  type="email"
+                  placeholder="tu@email.com"
+                  maxLength={100}
+                  value={contact.email}
+                  onChange={(e) => setContactField("email", e.target.value)}
+                  onBlur={() => markTouched("email")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.email ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+              </div>
+              {/* Teléfono */}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Teléfono *</label>
+                <input
+                  type="tel"
+                  placeholder="+54 11 1234 5678"
+                  maxLength={20}
+                  value={contact.telefono}
+                  onChange={(e) => setContactField("telefono", e.target.value)}
+                  onBlur={() => markTouched("telefono")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.telefono ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.telefono && <p className="text-xs text-red-500 mt-1">{errors.telefono}</p>}
+              </div>
+              {/* País */}
+              <div className="md:col-span-2">
+                <label className="text-xs text-muted-foreground mb-1 block">País *</label>
+                <select
                   value={contact.pais}
                   onChange={(e) => setContactField("pais", e.target.value)}
-                  className="w-full bg-background border border-border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
-                />
+                  onBlur={() => markTouched("pais")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] focus:outline-none transition-colors appearance-none ${
+                    contact.pais === "" ? "text-muted-foreground/50" : ""
+                  } ${errors.pais ? "border-red-500" : "border-border focus:border-accent"}`}
+                >
+                  <option value="" disabled>Selecciona tu país</option>
+                  {LATAM_SPAIN_COUNTRIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                {errors.pais && <p className="text-xs text-red-500 mt-1">{errors.pais}</p>}
               </div>
             </div>
           </motion.div>
