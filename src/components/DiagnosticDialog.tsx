@@ -166,10 +166,36 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [answers, setAnswers] = useState<Record<string, number | string | boolean>>({});
   const [contact, setContact] = useState({ nombre: "", apellido: "", email: "", telefono: "", pais: "" });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [showResults, setShowResults] = useState(false);
   const [autoSaved, setAutoSaved] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
+
+  const resetAll = useCallback(() => {
+    setAnswers({});
+    setContact({ nombre: "", apellido: "", email: "", telefono: "", pais: "" });
+    setTouched({});
+    setAutoSaved(false);
+    setSubmitting(false);
+    setSubmitted(false);
+    setConfirmClose(false);
+  }, []);
+
+  const handleOpenChange = useCallback((newOpen: boolean) => {
+    if (!newOpen && !submitted) {
+      // User trying to close before submitting — confirm
+      const hasData = Object.keys(answers).length > 0 ||
+        Object.values(contact).some((v) => v.trim() !== "");
+      if (hasData) {
+        setConfirmClose(true);
+        return;
+      }
+    }
+    if (!newOpen && submitted) {
+      resetAll();
+    }
+    onOpenChange(newOpen);
+  }, [submitted, answers, contact, onOpenChange, resetAll]);
 
   useEffect(() => {
     if (Object.keys(answers).length === 0) return;
