@@ -151,8 +151,8 @@
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 6px;
-    background: hsl(var(--secondary));
+    height: 16px;
+    background: transparent;
     outline: none;
     cursor: pointer;
   }
@@ -167,6 +167,7 @@
     border: 2px solid hsl(var(--accent));
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: -5px;
   }
 
   .diagnostic-slider::-webkit-slider-thumb:hover {
@@ -185,6 +186,7 @@
 
   .diagnostic-slider::-webkit-slider-runnable-track {
     height: 6px;
+    border-radius: 3px;
     background: linear-gradient(
       to right,
       hsl(var(--accent)) 0%,
@@ -192,5 +194,11 @@
       hsl(var(--secondary)) var(--val, 0%),
       hsl(var(--secondary)) 100%
     );
+  }
+
+  .diagnostic-slider::-moz-range-track {
+    height: 6px;
+    border-radius: 3px;
+    background: hsl(var(--secondary));
   }
 }
