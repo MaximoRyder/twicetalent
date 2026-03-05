@@ -455,7 +455,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
                         disabled={submitting}
                         className="tt-btn-primary disabled:opacity-50"
                       >
-                        {submitting ? "Enviando..." : "Enviar diagnóstico"}
+                        {submitting ? "Enviando..." : "Enviar información"}
                       </button>
                       <p className="text-xs text-muted-foreground mt-3">
                         Recibirás una respuesta personalizada en menos de 24 horas.
