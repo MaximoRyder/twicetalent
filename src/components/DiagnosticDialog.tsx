@@ -314,95 +314,6 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
             instrumento de lectura estratégica.
           </p>
 
-          {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: easing }}
-            className="border border-border p-5 bg-card/50 mb-5"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: contactComplete ? `hsl(var(--accent))` : `hsl(var(--muted-foreground))` }} />
-              <span className="text-sm font-medium text-foreground font-['Space_Grotesk']">Tus datos de contacto</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {/* Nombre */}
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Nombre *</label>
-                <input
-                  type="text"
-                  placeholder="Tu nombre"
-                  maxLength={40}
-                  value={contact.nombre}
-                  onChange={(e) => setContactField("nombre", e.target.value)}
-                  onBlur={() => markTouched("nombre")}
-                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.nombre ? "border-red-500" : "border-border focus:border-accent"}`}
-                />
-                {errors.nombre && <p className="text-xs text-red-500 mt-1">{errors.nombre}</p>}
-              </div>
-              {/* Apellido */}
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Apellido *</label>
-                <input
-                  type="text"
-                  placeholder="Tu apellido"
-                  maxLength={40}
-                  value={contact.apellido}
-                  onChange={(e) => setContactField("apellido", e.target.value)}
-                  onBlur={() => markTouched("apellido")}
-                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.apellido ? "border-red-500" : "border-border focus:border-accent"}`}
-                />
-                {errors.apellido && <p className="text-xs text-red-500 mt-1">{errors.apellido}</p>}
-              </div>
-              {/* Email */}
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Email *</label>
-                <input
-                  type="email"
-                  placeholder="tu@email.com"
-                  maxLength={100}
-                  value={contact.email}
-                  onChange={(e) => setContactField("email", e.target.value)}
-                  onBlur={() => markTouched("email")}
-                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.email ? "border-red-500" : "border-border focus:border-accent"}`}
-                />
-                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
-              </div>
-              {/* Teléfono */}
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Teléfono *</label>
-                <input
-                  type="tel"
-                  placeholder="+54 11 1234 5678"
-                  maxLength={20}
-                  value={contact.telefono}
-                  onChange={(e) => setContactField("telefono", e.target.value)}
-                  onBlur={() => markTouched("telefono")}
-                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.telefono ? "border-red-500" : "border-border focus:border-accent"}`}
-                />
-                {errors.telefono && <p className="text-xs text-red-500 mt-1">{errors.telefono}</p>}
-              </div>
-              {/* País */}
-              <div className="md:col-span-2">
-                <label className="text-xs text-muted-foreground mb-1 block">País *</label>
-                <select
-                  value={contact.pais}
-                  onChange={(e) => setContactField("pais", e.target.value)}
-                  onBlur={() => markTouched("pais")}
-                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] focus:outline-none transition-colors appearance-none ${
-                    contact.pais === "" ? "text-muted-foreground/50" : ""
-                  } ${errors.pais ? "border-red-500" : "border-border focus:border-accent"}`}
-                >
-                  <option value="" disabled>Selecciona tu país</option>
-                  {LATAM_SPAIN_COUNTRIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-                {errors.pais && <p className="text-xs text-red-500 mt-1">{errors.pais}</p>}
-              </div>
-            </div>
-          </motion.div>
-
           {/* Questions */}
           <div className="space-y-5">
             {questions.map((q, i) => (
@@ -438,6 +349,90 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
               </motion.div>
             ))}
           </div>
+
+          {/* Contact Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: easing }}
+            className="border border-border p-5 bg-card/50 mt-5"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: contactComplete ? `hsl(var(--accent))` : `hsl(var(--muted-foreground))` }} />
+              <span className="text-sm font-medium text-foreground font-['Space_Grotesk']">Tus datos de contacto</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Nombre *</label>
+                <input
+                  type="text"
+                  placeholder="Tu nombre"
+                  maxLength={40}
+                  value={contact.nombre}
+                  onChange={(e) => setContactField("nombre", e.target.value)}
+                  onBlur={() => markTouched("nombre")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.nombre ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.nombre && <p className="text-xs text-red-500 mt-1">{errors.nombre}</p>}
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Apellido *</label>
+                <input
+                  type="text"
+                  placeholder="Tu apellido"
+                  maxLength={40}
+                  value={contact.apellido}
+                  onChange={(e) => setContactField("apellido", e.target.value)}
+                  onBlur={() => markTouched("apellido")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.apellido ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.apellido && <p className="text-xs text-red-500 mt-1">{errors.apellido}</p>}
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Email *</label>
+                <input
+                  type="email"
+                  placeholder="tu@email.com"
+                  maxLength={100}
+                  value={contact.email}
+                  onChange={(e) => setContactField("email", e.target.value)}
+                  onBlur={() => markTouched("email")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.email ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Teléfono *</label>
+                <input
+                  type="tel"
+                  placeholder="+54 11 1234 5678"
+                  maxLength={20}
+                  value={contact.telefono}
+                  onChange={(e) => setContactField("telefono", e.target.value)}
+                  onBlur={() => markTouched("telefono")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors ${errors.telefono ? "border-red-500" : "border-border focus:border-accent"}`}
+                />
+                {errors.telefono && <p className="text-xs text-red-500 mt-1">{errors.telefono}</p>}
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs text-muted-foreground mb-1 block">País *</label>
+                <select
+                  value={contact.pais}
+                  onChange={(e) => setContactField("pais", e.target.value)}
+                  onBlur={() => markTouched("pais")}
+                  className={`w-full bg-background border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] focus:outline-none transition-colors appearance-none ${
+                    contact.pais === "" ? "text-muted-foreground/50" : ""
+                  } ${errors.pais ? "border-red-500" : "border-border focus:border-accent"}`}
+                >
+                  <option value="" disabled>Selecciona tu país</option>
+                  {LATAM_SPAIN_COUNTRIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                {errors.pais && <p className="text-xs text-red-500 mt-1">{errors.pais}</p>}
+              </div>
+            </div>
+          </motion.div>
 
           {/* CTA Submit */}
           <div className="mt-8 text-center">
