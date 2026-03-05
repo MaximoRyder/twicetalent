@@ -574,6 +574,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
               </motion.div>
             )}
           </div>
+          <div ref={bottomRef} />
         </div>
       </DialogContent>
 
