@@ -194,7 +194,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
     return Math.min(100, Math.round(sliderAvg * 0.9 + fundingBonus));
   }, [answers]);
 
-  const canSubmit = progress === 100;
+  const canSubmit = progress === 100 && contactComplete;
   const readiness = getReadinessLabel(readinessScore);
   const easing = [0.16, 1, 0.3, 1];
 
