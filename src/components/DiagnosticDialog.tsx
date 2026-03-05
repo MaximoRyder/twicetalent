@@ -381,15 +381,30 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
 
                 {/* CTA */}
                 <div className="text-center pt-5 border-t border-border">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    ¿Listo para convertir este diagnóstico en un plan de acción?
-                  </p>
-                  <button className="tt-btn-primary">
-                    Enviar
-                  </button>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Recibirás una respuesta personalizada en menos de 24 horas.
-                  </p>
+                  {submitted ? (
+                    <div>
+                      <p className="text-sm text-accent font-medium mb-2">✓ Diagnóstico enviado</p>
+                      <p className="text-xs text-muted-foreground">
+                        Recibirás una respuesta personalizada en menos de 24 horas.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        ¿Listo para convertir este diagnóstico en un plan de acción?
+                      </p>
+                      <button
+                        onClick={handleSubmit}
+                        disabled={submitting}
+                        className="tt-btn-primary disabled:opacity-50"
+                      >
+                        {submitting ? "Enviando..." : "Enviar diagnóstico"}
+                      </button>
+                      <p className="text-xs text-muted-foreground mt-3">
+                        Recibirás una respuesta personalizada en menos de 24 horas.
+                      </p>
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}
