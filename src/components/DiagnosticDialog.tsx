@@ -291,6 +291,9 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
     } else {
       setSubmitted(true);
       toast.success("¡Diagnóstico enviado con éxito!");
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
     }
   }, [answers, contact, readinessScore, canSubmit]);
 
