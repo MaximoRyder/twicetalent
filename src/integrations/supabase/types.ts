@@ -16,37 +16,52 @@ export type Database = {
     Tables: {
       solicitudes: {
         Row: {
+          apellido: string | null
           budget: string | null
           clarity: number | null
           created_at: string
+          email: string | null
           funding: boolean | null
           id: string
           logo_brand: number | null
+          nombre: string | null
+          pais: string | null
           readiness_score: number | null
+          telefono: string | null
           urgency: number | null
           validation: number | null
           website: number | null
         }
         Insert: {
+          apellido?: string | null
           budget?: string | null
           clarity?: number | null
           created_at?: string
+          email?: string | null
           funding?: boolean | null
           id?: string
           logo_brand?: number | null
+          nombre?: string | null
+          pais?: string | null
           readiness_score?: number | null
+          telefono?: string | null
           urgency?: number | null
           validation?: number | null
           website?: number | null
         }
         Update: {
+          apellido?: string | null
           budget?: string | null
           clarity?: number | null
           created_at?: string
+          email?: string | null
           funding?: boolean | null
           id?: string
           logo_brand?: number | null
+          nombre?: string | null
+          pais?: string | null
           readiness_score?: number | null
+          telefono?: string | null
           urgency?: number | null
           validation?: number | null
           website?: number | null

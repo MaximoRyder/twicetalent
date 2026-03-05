@@ -154,6 +154,7 @@ interface DiagnosticDialogProps {
 
 const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [answers, setAnswers] = useState<Record<string, number | string | boolean>>({});
+  const [contact, setContact] = useState({ nombre: "", apellido: "", email: "", telefono: "", pais: "" });
   const [showResults, setShowResults] = useState(false);
   const [autoSaved, setAutoSaved] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -170,10 +171,19 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
     setAnswers((prev) => ({ ...prev, [id]: value }));
   }, []);
 
+  const setContactField = useCallback((field: string, value: string) => {
+    setContact((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const contactComplete = contact.nombre.trim() !== "" && contact.apellido.trim() !== "" && contact.email.trim() !== "" && contact.telefono.trim() !== "" && contact.pais.trim() !== "";
+
   const progress = useMemo(() => {
-    const answered = questions.filter((q) => answers[q.id] !== undefined).length;
-    return Math.round((answered / questions.length) * 100);
-  }, [answers]);
+    const questionsAnswered = questions.filter((q) => answers[q.id] !== undefined).length;
+    const contactFields = [contact.nombre, contact.apellido, contact.email, contact.telefono, contact.pais];
+    const contactAnswered = contactFields.filter((f) => f.trim() !== "").length;
+    const total = questions.length + 5;
+    return Math.round(((questionsAnswered + contactAnswered) / total) * 100);
+  }, [answers, contact]);
 
   const readinessScore = useMemo(() => {
     const sliderIds = ["logo_brand", "website", "clarity", "validation", "urgency"];
@@ -184,13 +194,18 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
     return Math.min(100, Math.round(sliderAvg * 0.9 + fundingBonus));
   }, [answers]);
 
-  const canSubmit = progress === 100;
+  const canSubmit = progress === 100 && contactComplete;
   const readiness = getReadinessLabel(readinessScore);
   const easing = [0.16, 1, 0.3, 1];
 
   const handleSubmit = useCallback(async () => {
     setSubmitting(true);
     const { error } = await supabase.from("solicitudes").insert({
+      nombre: contact.nombre.trim(),
+      apellido: contact.apellido.trim(),
+      email: contact.email.trim(),
+      telefono: contact.telefono.trim(),
+      pais: contact.pais.trim(),
       logo_brand: typeof answers.logo_brand === "number" ? answers.logo_brand : 0,
       website: typeof answers.website === "number" ? answers.website : 0,
       clarity: typeof answers.clarity === "number" ? answers.clarity : 0,
@@ -207,7 +222,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
       setSubmitted(true);
       toast.success("¡Diagnóstico enviado con éxito!");
     }
-  }, [answers, readinessScore]);
+  }, [answers, contact, readinessScore]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -255,6 +270,48 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
             Evalúa la preparación real de tu proyecto. No es un formulario — es un
             instrumento de lectura estratégica.
           </p>
+
+          {/* Contact Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: easing }}
+            className="border border-border p-5 bg-card/50 mb-5"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: contactComplete ? `hsl(var(--accent))` : `hsl(var(--muted-foreground))` }} />
+              <span className="text-sm font-medium text-foreground font-['Space_Grotesk']">Tus datos de contacto</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[
+                { key: "nombre", label: "Nombre", type: "text", placeholder: "Tu nombre" },
+                { key: "apellido", label: "Apellido", type: "text", placeholder: "Tu apellido" },
+                { key: "email", label: "Email", type: "email", placeholder: "tu@email.com" },
+                { key: "telefono", label: "Teléfono", type: "tel", placeholder: "+1 234 567 890" },
+              ].map((field) => (
+                <div key={field.key}>
+                  <label className="text-xs text-muted-foreground mb-1 block">{field.label}</label>
+                  <input
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    value={contact[field.key as keyof typeof contact]}
+                    onChange={(e) => setContactField(field.key, e.target.value)}
+                    className="w-full bg-background border border-border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
+                  />
+                </div>
+              ))}
+              <div className="md:col-span-2">
+                <label className="text-xs text-muted-foreground mb-1 block">País</label>
+                <input
+                  type="text"
+                  placeholder="Tu país"
+                  value={contact.pais}
+                  onChange={(e) => setContactField("pais", e.target.value)}
+                  className="w-full bg-background border border-border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
+                />
+              </div>
+            </div>
+          </motion.div>
 
           {/* Questions */}
           <div className="space-y-5">
@@ -306,7 +363,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
                   onClick={() => setShowResults(true)}
                   className="tt-btn-primary"
                 >
-                  Enviar
+                  Enviar información
                 </button>
               </motion.div>
             )}
@@ -398,7 +455,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
                         disabled={submitting}
                         className="tt-btn-primary disabled:opacity-50"
                       >
-                        {submitting ? "Enviando..." : "Enviar diagnóstico"}
+                        {submitting ? "Enviando..." : "Enviar información"}
                       </button>
                       <p className="text-xs text-muted-foreground mt-3">
                         Recibirás una respuesta personalizada en menos de 24 horas.
