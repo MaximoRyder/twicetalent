@@ -166,10 +166,36 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [answers, setAnswers] = useState<Record<string, number | string | boolean>>({});
   const [contact, setContact] = useState({ nombre: "", apellido: "", email: "", telefono: "", pais: "" });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [showResults, setShowResults] = useState(false);
   const [autoSaved, setAutoSaved] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
+
+  const resetAll = useCallback(() => {
+    setAnswers({});
+    setContact({ nombre: "", apellido: "", email: "", telefono: "", pais: "" });
+    setTouched({});
+    setAutoSaved(false);
+    setSubmitting(false);
+    setSubmitted(false);
+    setConfirmClose(false);
+  }, []);
+
+  const handleOpenChange = useCallback((newOpen: boolean) => {
+    if (!newOpen && !submitted) {
+      // User trying to close before submitting — confirm
+      const hasData = Object.keys(answers).length > 0 ||
+        Object.values(contact).some((v) => v.trim() !== "");
+      if (hasData) {
+        setConfirmClose(true);
+        return;
+      }
+    }
+    if (!newOpen && submitted) {
+      resetAll();
+    }
+    onOpenChange(newOpen);
+  }, [submitted, answers, contact, onOpenChange, resetAll]);
 
   useEffect(() => {
     if (Object.keys(answers).length === 0) return;
@@ -268,7 +294,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   }, [answers, contact, readinessScore, canSubmit]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border p-0 gap-0 [&>button]:z-20 [&>button]:top-5 [&>button]:right-6">
         <DialogTitle className="sr-only">Diagnóstico Estratégico</DialogTitle>
 
@@ -526,17 +552,53 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="py-4"
+                className="py-4 space-y-4"
               >
-                <p className="text-sm text-accent font-medium mb-2">✓ Información enviada con éxito</p>
+                <p className="text-sm text-accent font-medium">✓ Información enviada con éxito</p>
                 <p className="text-xs text-muted-foreground">
                   Recibirás una respuesta personalizada en menos de 24 horas.
                 </p>
+                <button
+                  onClick={() => {
+                    resetAll();
+                    onOpenChange(false);
+                  }}
+                  className="tt-btn-secondary"
+                >
+                  Cerrar
+                </button>
               </motion.div>
             )}
           </div>
         </div>
       </DialogContent>
+
+      {/* Confirm close popup */}
+      <Dialog open={confirmClose} onOpenChange={setConfirmClose}>
+        <DialogContent className="max-w-sm bg-background border-border p-6 gap-0">
+          <DialogTitle className="tt-headline-md text-foreground mb-2">¿Salir del diagnóstico?</DialogTitle>
+          <p className="text-sm text-muted-foreground mb-6">
+            Si cierras ahora, perderás todo el progreso y tendrás que empezar de nuevo.
+          </p>
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={() => setConfirmClose(false)}
+              className="tt-btn-secondary text-sm py-2.5 px-5"
+            >
+              Continuar
+            </button>
+            <button
+              onClick={() => {
+                resetAll();
+                onOpenChange(false);
+              }}
+              className="tt-btn-primary text-sm py-2.5 px-5 bg-destructive border-destructive text-destructive-foreground hover:bg-destructive/80 hover:text-destructive-foreground"
+            >
+              Salir
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };
