@@ -156,6 +156,8 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [answers, setAnswers] = useState<Record<string, number | string | boolean>>({});
   const [showResults, setShowResults] = useState(false);
   const [autoSaved, setAutoSaved] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     if (Object.keys(answers).length === 0) return;
