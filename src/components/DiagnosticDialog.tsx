@@ -363,7 +363,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
                   onClick={() => setShowResults(true)}
                   className="tt-btn-primary"
                 >
-                  Enviar
+                  Enviar información
                 </button>
               </motion.div>
             )}
