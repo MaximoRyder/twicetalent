@@ -154,6 +154,7 @@ interface DiagnosticDialogProps {
 
 const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [answers, setAnswers] = useState<Record<string, number | string | boolean>>({});
+  const [contact, setContact] = useState({ nombre: "", apellido: "", email: "", telefono: "", pais: "" });
   const [showResults, setShowResults] = useState(false);
   const [autoSaved, setAutoSaved] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -170,10 +171,19 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
     setAnswers((prev) => ({ ...prev, [id]: value }));
   }, []);
 
+  const setContactField = useCallback((field: string, value: string) => {
+    setContact((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const contactComplete = contact.nombre.trim() !== "" && contact.apellido.trim() !== "" && contact.email.trim() !== "" && contact.telefono.trim() !== "" && contact.pais.trim() !== "";
+
   const progress = useMemo(() => {
-    const answered = questions.filter((q) => answers[q.id] !== undefined).length;
-    return Math.round((answered / questions.length) * 100);
-  }, [answers]);
+    const questionsAnswered = questions.filter((q) => answers[q.id] !== undefined).length;
+    const contactFields = [contact.nombre, contact.apellido, contact.email, contact.telefono, contact.pais];
+    const contactAnswered = contactFields.filter((f) => f.trim() !== "").length;
+    const total = questions.length + 5;
+    return Math.round(((questionsAnswered + contactAnswered) / total) * 100);
+  }, [answers, contact]);
 
   const readinessScore = useMemo(() => {
     const sliderIds = ["logo_brand", "website", "clarity", "validation", "urgency"];
