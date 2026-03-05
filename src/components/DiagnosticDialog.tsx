@@ -552,17 +552,53 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="py-4"
+                className="py-4 space-y-4"
               >
-                <p className="text-sm text-accent font-medium mb-2">✓ Información enviada con éxito</p>
+                <p className="text-sm text-accent font-medium">✓ Información enviada con éxito</p>
                 <p className="text-xs text-muted-foreground">
                   Recibirás una respuesta personalizada en menos de 24 horas.
                 </p>
+                <button
+                  onClick={() => {
+                    resetAll();
+                    onOpenChange(false);
+                  }}
+                  className="tt-btn-secondary"
+                >
+                  Cerrar
+                </button>
               </motion.div>
             )}
           </div>
         </div>
       </DialogContent>
+
+      {/* Confirm close popup */}
+      <Dialog open={confirmClose} onOpenChange={setConfirmClose}>
+        <DialogContent className="max-w-sm bg-background border-border p-6 gap-0">
+          <DialogTitle className="tt-headline-md text-foreground mb-2">¿Salir del diagnóstico?</DialogTitle>
+          <p className="text-sm text-muted-foreground mb-6">
+            Si cierras ahora, perderás todo el progreso y tendrás que empezar de nuevo.
+          </p>
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={() => setConfirmClose(false)}
+              className="tt-btn-secondary text-sm py-2.5 px-5"
+            >
+              Continuar
+            </button>
+            <button
+              onClick={() => {
+                resetAll();
+                onOpenChange(false);
+              }}
+              className="tt-btn-primary text-sm py-2.5 px-5 bg-destructive border-destructive text-destructive-foreground hover:bg-destructive/80 hover:text-destructive-foreground"
+            >
+              Salir
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };
