@@ -170,6 +170,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const resetAll = useCallback(() => {
     setAnswers({});
