@@ -5,6 +5,8 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 /* ─── Types ─── */
 interface SliderQuestion {
@@ -154,6 +156,8 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [answers, setAnswers] = useState<Record<string, number | string | boolean>>({});
   const [showResults, setShowResults] = useState(false);
   const [autoSaved, setAutoSaved] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     if (Object.keys(answers).length === 0) return;
@@ -183,6 +187,27 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const canSubmit = progress === 100;
   const readiness = getReadinessLabel(readinessScore);
   const easing = [0.16, 1, 0.3, 1];
+
+  const handleSubmit = useCallback(async () => {
+    setSubmitting(true);
+    const { error } = await supabase.from("solicitudes").insert({
+      logo_brand: typeof answers.logo_brand === "number" ? answers.logo_brand : 0,
+      website: typeof answers.website === "number" ? answers.website : 0,
+      clarity: typeof answers.clarity === "number" ? answers.clarity : 0,
+      validation: typeof answers.validation === "number" ? answers.validation : 0,
+      funding: answers.funding === true,
+      budget: typeof answers.budget === "string" ? answers.budget : null,
+      urgency: typeof answers.urgency === "number" ? answers.urgency : 0,
+      readiness_score: readinessScore,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error("Hubo un error al enviar. Intenta de nuevo.");
+    } else {
+      setSubmitted(true);
+      toast.success("¡Diagnóstico enviado con éxito!");
+    }
+  }, [answers, readinessScore]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -356,15 +381,30 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
 
                 {/* CTA */}
                 <div className="text-center pt-5 border-t border-border">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    ¿Listo para convertir este diagnóstico en un plan de acción?
-                  </p>
-                  <button className="tt-btn-primary">
-                    Enviar
-                  </button>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Recibirás una respuesta personalizada en menos de 24 horas.
-                  </p>
+                  {submitted ? (
+                    <div>
+                      <p className="text-sm text-accent font-medium mb-2">✓ Diagnóstico enviado</p>
+                      <p className="text-xs text-muted-foreground">
+                        Recibirás una respuesta personalizada en menos de 24 horas.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        ¿Listo para convertir este diagnóstico en un plan de acción?
+                      </p>
+                      <button
+                        onClick={handleSubmit}
+                        disabled={submitting}
+                        className="tt-btn-primary disabled:opacity-50"
+                      >
+                        {submitting ? "Enviando..." : "Enviar diagnóstico"}
+                      </button>
+                      <p className="text-xs text-muted-foreground mt-3">
+                        Recibirás una respuesta personalizada en menos de 24 horas.
+                      </p>
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}
