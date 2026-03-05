@@ -434,38 +434,6 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
             </div>
           </motion.div>
 
-          {/* CTA Submit */}
-          <div className="mt-8 text-center">
-            {!submitted ? (
-              <button
-                onClick={() => {
-                  if (!canSubmit) {
-                    // Mark all fields as touched to show errors
-                    ["nombre", "apellido", "email", "telefono", "pais"].forEach((f) => markTouched(f));
-                    toast.error("Completa todos los campos correctamente antes de enviar.");
-                    return;
-                  }
-                  handleSubmit();
-                }}
-                disabled={submitting}
-                className={`tt-btn-primary disabled:opacity-50 ${!canSubmit ? "opacity-60" : ""}`}
-              >
-                {submitting ? "Enviando..." : "Enviar información"}
-              </button>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="py-4"
-              >
-                <p className="text-sm text-accent font-medium mb-2">✓ Información enviada con éxito</p>
-                <p className="text-xs text-muted-foreground">
-                  Recibirás una respuesta personalizada en menos de 24 horas.
-                </p>
-              </motion.div>
-            )}
-          </div>
-
           {/* Results */}
           <AnimatePresence>
             {submitted && (
@@ -536,6 +504,37 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* CTA Submit */}
+          <div className="mt-8 text-center">
+            {!submitted ? (
+              <button
+                onClick={() => {
+                  if (!canSubmit) {
+                    ["nombre", "apellido", "email", "telefono", "pais"].forEach((f) => markTouched(f));
+                    toast.error("Completa todos los campos correctamente antes de enviar.");
+                    return;
+                  }
+                  handleSubmit();
+                }}
+                disabled={submitting}
+                className={`tt-btn-primary disabled:opacity-50 ${!canSubmit ? "opacity-60" : ""}`}
+              >
+                {submitting ? "Enviando..." : "Enviar información"}
+              </button>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="py-4"
+              >
+                <p className="text-sm text-accent font-medium mb-2">✓ Información enviada con éxito</p>
+                <p className="text-xs text-muted-foreground">
+                  Recibirás una respuesta personalizada en menos de 24 horas.
+                </p>
+              </motion.div>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
