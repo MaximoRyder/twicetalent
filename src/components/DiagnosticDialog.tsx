@@ -152,9 +152,20 @@ interface DiagnosticDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const LATAM_SPAIN_COUNTRIES = [
+  "Argentina", "Bolivia", "Brasil", "Chile", "Colombia", "Costa Rica", "Cuba",
+  "Ecuador", "El Salvador", "España", "Guatemala", "Honduras", "México",
+  "Nicaragua", "Panamá", "Paraguay", "Perú", "Puerto Rico",
+  "República Dominicana", "Uruguay", "Venezuela",
+];
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^\+?[\d\s\-()]{7,20}$/;
+
 const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   const [answers, setAnswers] = useState<Record<string, number | string | boolean>>({});
   const [contact, setContact] = useState({ nombre: "", apellido: "", email: "", telefono: "", pais: "" });
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [showResults, setShowResults] = useState(false);
   const [autoSaved, setAutoSaved] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -172,10 +183,40 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
   }, []);
 
   const setContactField = useCallback((field: string, value: string) => {
-    setContact((prev) => ({ ...prev, [field]: value }));
+    if (field === "telefono") {
+      // Solo permitir números, +, espacios, guiones, paréntesis
+      const cleaned = value.replace(/[^\d+\s\-()]/g, "");
+      setContact((prev) => ({ ...prev, [field]: cleaned }));
+    } else if (field === "nombre" || field === "apellido") {
+      // Solo letras, espacios, acentos
+      const cleaned = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]/g, "");
+      setContact((prev) => ({ ...prev, [field]: cleaned }));
+    } else {
+      setContact((prev) => ({ ...prev, [field]: value }));
+    }
   }, []);
 
-  const contactComplete = contact.nombre.trim() !== "" && contact.apellido.trim() !== "" && contact.email.trim() !== "" && contact.telefono.trim() !== "" && contact.pais.trim() !== "";
+  const markTouched = useCallback((field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  }, []);
+
+  const errors = useMemo(() => {
+    const e: Record<string, string> = {};
+    if (touched.nombre && contact.nombre.trim().length < 2) e.nombre = "Mínimo 2 caracteres";
+    if (touched.apellido && contact.apellido.trim().length < 2) e.apellido = "Mínimo 2 caracteres";
+    if (touched.email && !EMAIL_REGEX.test(contact.email.trim())) e.email = "Email inválido";
+    if (touched.telefono && !PHONE_REGEX.test(contact.telefono.trim())) e.telefono = "Teléfono inválido";
+    if (touched.pais && contact.pais.trim() === "") e.pais = "Selecciona un país";
+    return e;
+  }, [contact, touched]);
+
+  const contactValid = contact.nombre.trim().length >= 2 &&
+    contact.apellido.trim().length >= 2 &&
+    EMAIL_REGEX.test(contact.email.trim()) &&
+    PHONE_REGEX.test(contact.telefono.trim()) &&
+    contact.pais.trim() !== "";
+
+  const contactComplete = contactValid;
 
   const progress = useMemo(() => {
     const questionsAnswered = questions.filter((q) => answers[q.id] !== undefined).length;
@@ -194,11 +235,13 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
     return Math.min(100, Math.round(sliderAvg * 0.9 + fundingBonus));
   }, [answers]);
 
-  const canSubmit = progress === 100 && contactComplete;
+  const allQuestionsAnswered = questions.every((q) => answers[q.id] !== undefined);
+  const canSubmit = allQuestionsAnswered && contactValid;
   const readiness = getReadinessLabel(readinessScore);
   const easing = [0.16, 1, 0.3, 1];
 
   const handleSubmit = useCallback(async () => {
+    if (!canSubmit) return;
     setSubmitting(true);
     const { error } = await supabase.from("solicitudes").insert({
       nombre: contact.nombre.trim(),
@@ -222,7 +265,7 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
       setSubmitted(true);
       toast.success("¡Diagnóstico enviado con éxito!");
     }
-  }, [answers, contact, readinessScore]);
+  }, [answers, contact, readinessScore, canSubmit]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
