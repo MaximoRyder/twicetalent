@@ -271,6 +271,48 @@ const DiagnosticDialog = ({ open, onOpenChange }: DiagnosticDialogProps) => {
             instrumento de lectura estratégica.
           </p>
 
+          {/* Contact Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: easing }}
+            className="border border-border p-5 bg-card/50 mb-5"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: contactComplete ? `hsl(var(--accent))` : `hsl(var(--muted-foreground))` }} />
+              <span className="text-sm font-medium text-foreground font-['Space_Grotesk']">Tus datos de contacto</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[
+                { key: "nombre", label: "Nombre", type: "text", placeholder: "Tu nombre" },
+                { key: "apellido", label: "Apellido", type: "text", placeholder: "Tu apellido" },
+                { key: "email", label: "Email", type: "email", placeholder: "tu@email.com" },
+                { key: "telefono", label: "Teléfono", type: "tel", placeholder: "+1 234 567 890" },
+              ].map((field) => (
+                <div key={field.key}>
+                  <label className="text-xs text-muted-foreground mb-1 block">{field.label}</label>
+                  <input
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    value={contact[field.key as keyof typeof contact]}
+                    onChange={(e) => setContactField(field.key, e.target.value)}
+                    className="w-full bg-background border border-border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
+                  />
+                </div>
+              ))}
+              <div className="md:col-span-2">
+                <label className="text-xs text-muted-foreground mb-1 block">País</label>
+                <input
+                  type="text"
+                  placeholder="Tu país"
+                  value={contact.pais}
+                  onChange={(e) => setContactField("pais", e.target.value)}
+                  className="w-full bg-background border border-border px-3 py-2.5 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
+                />
+              </div>
+            </div>
+          </motion.div>
+
           {/* Questions */}
           <div className="space-y-5">
             {questions.map((q, i) => (
