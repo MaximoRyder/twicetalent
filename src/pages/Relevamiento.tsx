@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import logo from "@/assets/tt-logo-white.png";
 import {
   RelevamientoForm, initialForm, PAISES, CODIGOS_PAIS, INDUSTRIAS,
-  FUNCIONALIDADES, IDIOMAS, PRESUPUESTOS,
+  FUNCIONALIDADES, IDIOMAS,
 } from "@/lib/relevamientoData";
 
 const STORAGE_KEY = "tt_relevamiento_v1";
