@@ -391,7 +391,7 @@ const Relevamiento = () => {
         idiomas_otros: form.multiidioma === "si" ? form.idiomas_otros.trim() || null : null,
         plazo: form.plazo,
         fecha_limite: form.fecha_limite.trim() || null,
-        presupuesto: form.presupuesto,
+        presupuesto: "No especificado",
         modelo_trabajo: form.modelo_trabajo || null,
         comentarios: form.comentarios.trim() || null,
         como_nos_conocio: form.como_nos_conocio || null,
