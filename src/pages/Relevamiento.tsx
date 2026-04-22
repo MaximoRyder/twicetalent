@@ -1018,8 +1018,8 @@ const Relevamiento = () => {
                           <dd className="text-foreground font-['Space_Grotesk']">{form.funcionalidades.length} seleccionadas</dd>
                         </div>
                         <div>
-                          <dt className="text-muted-foreground text-xs uppercase tracking-[0.15em] mb-1">Plazo · Presupuesto</dt>
-                          <dd className="text-foreground font-['Space_Grotesk']">{form.plazo} · {form.presupuesto}</dd>
+                          <dt className="text-muted-foreground text-xs uppercase tracking-[0.15em] mb-1">Plazo</dt>
+                          <dd className="text-foreground font-['Space_Grotesk']">{form.plazo}</dd>
                         </div>
                       </dl>
                     </div>
