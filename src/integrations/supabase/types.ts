@@ -14,6 +14,144 @@ export type Database = {
   }
   public: {
     Tables: {
+      relevamientos: {
+        Row: {
+          acepta_contacto: boolean
+          acepta_privacidad: boolean
+          apellido: string
+          archivos_links: string | null
+          ciudad: string
+          comentarios: string | null
+          como_nos_conocio: string | null
+          competencia: string | null
+          created_at: string
+          crm_detalle: string | null
+          descripcion_negocio: string
+          email: string
+          empresa: string | null
+          estado_marca: string
+          etapa_proyecto: string
+          fecha_limite: string | null
+          funcionalidades: string[] | null
+          funcionalidades_otras: string | null
+          id: string
+          idioma_principal: string | null
+          idiomas: string[] | null
+          idiomas_otros: string | null
+          industria: string
+          industria_otro: string | null
+          modelo_gestion: string
+          modelo_trabajo: string | null
+          multiidioma: boolean
+          nombre: string
+          pais: string
+          pasarela_pagos: string | null
+          plazo: string
+          presupuesto: string
+          publico_objetivo: string
+          que_evitar: string | null
+          que_te_gusta: string | null
+          referencias_esteticas: string | null
+          rol: string | null
+          sitio_web: string | null
+          sitios_referencia: string | null
+          telefono: string | null
+          telefono_codigo_pais: string | null
+          tipo_proyecto: string
+          tipo_proyecto_otro: string | null
+        }
+        Insert: {
+          acepta_contacto?: boolean
+          acepta_privacidad?: boolean
+          apellido: string
+          archivos_links?: string | null
+          ciudad: string
+          comentarios?: string | null
+          como_nos_conocio?: string | null
+          competencia?: string | null
+          created_at?: string
+          crm_detalle?: string | null
+          descripcion_negocio: string
+          email: string
+          empresa?: string | null
+          estado_marca: string
+          etapa_proyecto: string
+          fecha_limite?: string | null
+          funcionalidades?: string[] | null
+          funcionalidades_otras?: string | null
+          id?: string
+          idioma_principal?: string | null
+          idiomas?: string[] | null
+          idiomas_otros?: string | null
+          industria: string
+          industria_otro?: string | null
+          modelo_gestion: string
+          modelo_trabajo?: string | null
+          multiidioma?: boolean
+          nombre: string
+          pais: string
+          pasarela_pagos?: string | null
+          plazo: string
+          presupuesto: string
+          publico_objetivo: string
+          que_evitar?: string | null
+          que_te_gusta?: string | null
+          referencias_esteticas?: string | null
+          rol?: string | null
+          sitio_web?: string | null
+          sitios_referencia?: string | null
+          telefono?: string | null
+          telefono_codigo_pais?: string | null
+          tipo_proyecto: string
+          tipo_proyecto_otro?: string | null
+        }
+        Update: {
+          acepta_contacto?: boolean
+          acepta_privacidad?: boolean
+          apellido?: string
+          archivos_links?: string | null
+          ciudad?: string
+          comentarios?: string | null
+          como_nos_conocio?: string | null
+          competencia?: string | null
+          created_at?: string
+          crm_detalle?: string | null
+          descripcion_negocio?: string
+          email?: string
+          empresa?: string | null
+          estado_marca?: string
+          etapa_proyecto?: string
+          fecha_limite?: string | null
+          funcionalidades?: string[] | null
+          funcionalidades_otras?: string | null
+          id?: string
+          idioma_principal?: string | null
+          idiomas?: string[] | null
+          idiomas_otros?: string | null
+          industria?: string
+          industria_otro?: string | null
+          modelo_gestion?: string
+          modelo_trabajo?: string | null
+          multiidioma?: boolean
+          nombre?: string
+          pais?: string
+          pasarela_pagos?: string | null
+          plazo?: string
+          presupuesto?: string
+          publico_objetivo?: string
+          que_evitar?: string | null
+          que_te_gusta?: string | null
+          referencias_esteticas?: string | null
+          rol?: string | null
+          sitio_web?: string | null
+          sitios_referencia?: string | null
+          telefono?: string | null
+          telefono_codigo_pais?: string | null
+          tipo_proyecto?: string
+          tipo_proyecto_otro?: string | null
+        }
+        Relationships: []
+      }
       solicitudes: {
         Row: {
           apellido: string | null
