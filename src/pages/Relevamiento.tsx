@@ -920,9 +920,9 @@ const Relevamiento = () => {
 
                 {step === 7 && (
                   <SectionCard
-                    number="08 — Tiempos y presupuesto"
-                    title="¿En qué marco económico y temporal nos movemos?"
-                    description="Este punto define el tipo de propuesta que podemos preparar. Sin presupuesto no hay alcance."
+                    number="08 — Tiempos"
+                    title="¿En qué marco temporal nos movemos?"
+                    description="El plazo define el ritmo de ejecución y el tipo de propuesta que podemos preparar."
                   >
                     <div>
                       <FieldLabel required>Plazo deseado</FieldLabel>
