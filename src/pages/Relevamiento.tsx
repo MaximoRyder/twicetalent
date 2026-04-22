@@ -948,15 +948,6 @@ const Relevamiento = () => {
                       />
                     </div>
                     <div>
-                      <FieldLabel required>Rango de presupuesto estimado (USD)</FieldLabel>
-                      <SelectField
-                        value={form.presupuesto}
-                        onChange={(v) => update("presupuesto", v)}
-                        error={errors.presupuesto}
-                        options={PRESUPUESTOS.map((p) => ({ value: p, label: p }))}
-                      />
-                    </div>
-                    <div>
                       <FieldLabel>Modelo de trabajo imaginado</FieldLabel>
                       <div className="grid sm:grid-cols-3 gap-3">
                         {MODELOS_TRABAJO.map((m) => (
