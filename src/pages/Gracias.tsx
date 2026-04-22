@@ -33,38 +33,61 @@ const Gracias = () => {
       </nav>
 
       <main className="flex-1 flex items-center justify-center px-6 pt-32 pb-20">
-        <div className="max-w-2xl text-center">
-          <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-8" strokeWidth={1.2} />
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-6">
-            Recibimos tu relevamiento
-          </h1>
-          <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
-            Gracias por tomarte el tiempo de contarnos sobre tu proyecto. Vamos a revisar
-            la información con detenimiento.
-          </p>
-          <p className="text-base text-muted-foreground mb-12 leading-relaxed">
-            Te vamos a contactar en un plazo estimado de <strong className="text-foreground">48 a 72 horas hábiles</strong> con
-            una primera devolución y, si corresponde, una propuesta formal.
-          </p>
-
-          <div className="border border-border/40 rounded-lg p-6 mb-12 text-left bg-card/30">
-            <p className="text-sm uppercase tracking-[0.15em] text-muted-foreground mb-3">
-              Próximos pasos
-            </p>
-            <ol className="space-y-2 text-sm text-foreground/80">
-              <li>1. Análisis interno del relevamiento.</li>
-              <li>2. Reunión breve para alinear alcance y expectativas.</li>
-              <li>3. Envío de propuesta con tiempos y presupuesto.</li>
-            </ol>
+        <div className="max-w-2xl w-full">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="w-2 h-2 rounded-full bg-accent" />
+            <span className="text-xs uppercase tracking-[0.2em] text-accent font-['Space_Grotesk'] font-medium">
+              Relevamiento recibido
+            </span>
           </div>
 
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 tt-btn-secondary text-xs py-3 px-6"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al inicio
-          </Link>
+          <div className="border border-border bg-card/50 p-8 md:p-12">
+            <CheckCircle2 className="w-12 h-12 text-accent mb-8" strokeWidth={1.2} />
+            <h1 className="tt-headline-lg text-foreground mb-5">
+              Lo recibimos. Ahora nos toca leerlo bien.
+            </h1>
+            <p className="tt-body text-secondary-foreground mb-4">
+              Gracias por tomarte el tiempo de contarnos sobre tu proyecto. Vamos a revisar
+              la información con la atención que merece.
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Te contactaremos en un plazo de{" "}
+              <strong className="text-foreground font-['Space_Grotesk'] font-medium">
+                48 a 72 horas hábiles
+              </strong>{" "}
+              con una primera devolución y, si corresponde, una propuesta formal.
+            </p>
+
+            <div className="mt-10 pt-8 border-t border-border">
+              <p className="tt-label text-muted-foreground mb-5">Próximos pasos</p>
+              <ol className="space-y-4">
+                {[
+                  "Análisis interno del relevamiento",
+                  "Reunión breve para alinear alcance y expectativas",
+                  "Envío de propuesta con tiempos y presupuesto",
+                ].map((step, i) => (
+                  <li key={step} className="flex items-start gap-4">
+                    <span className="text-xs uppercase tracking-[0.2em] text-accent font-['Space_Grotesk'] font-medium tabular-nums mt-0.5">
+                      0{i + 1}
+                    </span>
+                    <span className="text-sm text-foreground/85 font-['Space_Grotesk']">
+                      {step}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors font-['Space_Grotesk'] font-medium"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Volver al inicio
+            </Link>
+          </div>
         </div>
       </main>
     </div>
