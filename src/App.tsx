@@ -7,6 +7,10 @@ import Index from "./pages/Index";
 import Method from "./pages/Method";
 import Relevamiento from "./pages/Relevamiento";
 import Gracias from "./pages/Gracias";
+import BackofficeLogin from "./pages/backoffice/BackofficeLogin";
+import BackofficeSolicitudes from "./pages/backoffice/BackofficeSolicitudes";
+import BackofficeRelevamientos from "./pages/backoffice/BackofficeRelevamientos";
+import { Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +26,10 @@ const App = () => (
           <Route path="/method" element={<Method />} />
           <Route path="/relevamiento" element={<Relevamiento />} />
           <Route path="/relevamiento/gracias" element={<Gracias />} />
+          <Route path="/backoffice" element={<Navigate to="/backoffice/solicitudes" replace />} />
+          <Route path="/backoffice/login" element={<BackofficeLogin />} />
+          <Route path="/backoffice/solicitudes" element={<BackofficeSolicitudes />} />
+          <Route path="/backoffice/relevamientos" element={<BackofficeRelevamientos />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
