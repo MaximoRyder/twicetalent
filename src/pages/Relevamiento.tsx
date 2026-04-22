@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import logo from "@/assets/tt-logo-white.png";
 import {
   RelevamientoForm, initialForm, PAISES, CODIGOS_PAIS, INDUSTRIAS,
-  FUNCIONALIDADES, IDIOMAS, PRESUPUESTOS,
+  FUNCIONALIDADES, IDIOMAS,
 } from "@/lib/relevamientoData";
 
 const STORAGE_KEY = "tt_relevamiento_v1";
@@ -44,7 +44,6 @@ const stepSchemas = [
   }),
   z.object({
     plazo: z.string().min(1, "Requerido"),
-    presupuesto: z.string().min(1, "Requerido"),
   }),
   z.object({}),
 ];
@@ -392,7 +391,7 @@ const Relevamiento = () => {
         idiomas_otros: form.multiidioma === "si" ? form.idiomas_otros.trim() || null : null,
         plazo: form.plazo,
         fecha_limite: form.fecha_limite.trim() || null,
-        presupuesto: form.presupuesto,
+        presupuesto: "No especificado",
         modelo_trabajo: form.modelo_trabajo || null,
         comentarios: form.comentarios.trim() || null,
         como_nos_conocio: form.como_nos_conocio || null,
@@ -921,9 +920,9 @@ const Relevamiento = () => {
 
                 {step === 7 && (
                   <SectionCard
-                    number="08 — Tiempos y presupuesto"
-                    title="¿En qué marco económico y temporal nos movemos?"
-                    description="Este punto define el tipo de propuesta que podemos preparar. Sin presupuesto no hay alcance."
+                    number="08 — Tiempos"
+                    title="¿En qué marco temporal nos movemos?"
+                    description="El plazo define el ritmo de ejecución y el tipo de propuesta que podemos preparar."
                   >
                     <div>
                       <FieldLabel required>Plazo deseado</FieldLabel>
@@ -946,15 +945,6 @@ const Relevamiento = () => {
                         value={form.fecha_limite}
                         onChange={(v) => update("fecha_limite", v)}
                         placeholder="Lanzamiento, evento, temporada..."
-                      />
-                    </div>
-                    <div>
-                      <FieldLabel required>Rango de presupuesto estimado (USD)</FieldLabel>
-                      <SelectField
-                        value={form.presupuesto}
-                        onChange={(v) => update("presupuesto", v)}
-                        error={errors.presupuesto}
-                        options={PRESUPUESTOS.map((p) => ({ value: p, label: p }))}
                       />
                     </div>
                     <div>
@@ -1028,8 +1018,8 @@ const Relevamiento = () => {
                           <dd className="text-foreground font-['Space_Grotesk']">{form.funcionalidades.length} seleccionadas</dd>
                         </div>
                         <div>
-                          <dt className="text-muted-foreground text-xs uppercase tracking-[0.15em] mb-1">Plazo · Presupuesto</dt>
-                          <dd className="text-foreground font-['Space_Grotesk']">{form.plazo} · {form.presupuesto}</dd>
+                          <dt className="text-muted-foreground text-xs uppercase tracking-[0.15em] mb-1">Plazo</dt>
+                          <dd className="text-foreground font-['Space_Grotesk']">{form.plazo}</dd>
                         </div>
                       </dl>
                     </div>
