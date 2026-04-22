@@ -44,7 +44,6 @@ const stepSchemas = [
   }),
   z.object({
     plazo: z.string().min(1, "Requerido"),
-    presupuesto: z.string().min(1, "Requerido"),
   }),
   z.object({}),
 ];
