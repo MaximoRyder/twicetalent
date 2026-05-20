@@ -137,7 +137,7 @@ export const initialForm: RelevamientoForm = {
   nombre: "",
   apellido: "",
   email: "",
-  telefono_codigo_pais: "+54",
+  telefono_codigo_pais: "+598",
   telefono: "",
   empresa: "",
   rol: "",

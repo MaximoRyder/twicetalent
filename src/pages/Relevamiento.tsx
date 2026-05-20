@@ -576,7 +576,7 @@ const Relevamiento = () => {
                           onChange={(v) => update("telefono_codigo_pais", v)}
                           options={CODIGOS_PAIS.map((c, i) => ({ value: c.code, label: `${c.country} ${c.code}` })).filter((o, i, a) => a.findIndex(x => x.label === o.label) === i)}
                         />
-                        <TextField value={form.telefono} onChange={(v) => update("telefono", v)} placeholder="11 1234 5678" />
+                        <TextField value={form.telefono} onChange={(v) => update("telefono", v)} placeholder="99 123 456" />
                       </div>
                     </div>
                     <div className="grid md:grid-cols-2 gap-5">
