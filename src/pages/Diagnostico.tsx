@@ -607,9 +607,9 @@ const Diagnostico = () => {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-8">
-                  {current.questions.map((q) => (
-                    <div key={q.code}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-8">
+                  {current.questions.filter(isVisible).map((q) => (
+                    <div key={q.code} className={q.half ? "sm:col-span-1" : "sm:col-span-2"}>
                       <FieldLabel required={q.required}>{q.label}</FieldLabel>
                       {q.help && (
                         <p className="text-xs text-muted-foreground mb-3 -mt-1 break-words">{q.help}</p>
