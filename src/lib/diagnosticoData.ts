@@ -2,7 +2,14 @@ import type { IconName } from "@/components/ui/Icon";
 
 export type Option = { value: string; label: string; desc?: string };
 
-export type QuestionType = "radio" | "multi" | "text" | "textarea" | "file";
+export type QuestionType =
+  | "radio"
+  | "multi"
+  | "text"
+  | "textarea"
+  | "number"
+  | "file"
+  | "files";
 
 export interface Question {
   code: string;
@@ -15,6 +22,11 @@ export interface Question {
   maxLength?: number;
   fileTipo?: "plano_comercial" | "sostenibilidad";
   accept?: string;
+  multiple?: boolean;
+  /** Render condicional: se muestra si la respuesta de `code` esta en `values` */
+  showIf?: { code: string; values: string[] };
+  /** Layout: ocupa media columna en desktop */
+  half?: boolean;
 }
 
 export interface Step {
@@ -32,7 +44,13 @@ export const ROLES_PROYECTO: Option[] = [
   { value: "asesor_externo", label: "Asesor externo" },
 ];
 
-/** Pasos 1 a 4 (el paso 0 es contacto y vive en columnas propias) */
+const SI_PARCIAL_NO: Option[] = [
+  { value: "si", label: "Sí" },
+  { value: "parcial", label: "Parcial" },
+  { value: "no", label: "No" },
+];
+
+/** Bloques del relevamiento de desarrollo inmobiliario */
 export const STEPS: Step[] = [
   {
     key: "contacto",
@@ -42,185 +60,322 @@ export const STEPS: Step[] = [
     questions: [],
   },
   {
-    key: "producto",
-    title: "Producto y precio",
+    key: "lotes",
+    title: "Lotes y precios",
     eyebrow: "Bloque 02",
-    icon: "Package",
+    icon: "LandPlot",
     questions: [
       {
-        code: "producto_definido",
-        label: "¿Qué tan definido está el producto o servicio?",
+        code: "precio_lote_tipo",
+        label: "Precio actual de un lote tipo en USD",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 85000",
+      },
+      {
+        code: "precio_por_m2",
+        label: "Precio por metro cuadrado en USD",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 45",
+      },
+      {
+        code: "precio_lote_min",
+        label: "Precio del lote más económico en USD",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 60000",
+      },
+      {
+        code: "precio_lote_max",
+        label: "Precio del lote más alto en USD",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 240000",
+      },
+      {
+        code: "precio_estado",
+        label: "El precio es",
         type: "radio",
-        required: true,
         options: [
-          { value: "definido", label: "Definido", desc: "Sé exactamente qué vendo y a quién" },
-          { value: "parcial", label: "Parcialmente definido", desc: "Tengo la idea, faltan detalles" },
-          { value: "explorando", label: "En exploración", desc: "Todavía estoy validando el concepto" },
+          { value: "definitivo", label: "Definitivo" },
+          { value: "estimativo", label: "Estimativo" },
+          { value: "en_evaluacion", label: "En evaluación" },
         ],
       },
       {
-        code: "ticket_promedio",
-        label: "Ticket promedio estimado por venta",
-        type: "radio",
-        required: true,
-        options: [
-          { value: "menos_20", label: "Menos de USD 20" },
-          { value: "20_50", label: "USD 20 a 50" },
-          { value: "50_150", label: "USD 50 a 150" },
-          { value: "150_500", label: "USD 150 a 500" },
-          { value: "mas_500", label: "Más de USD 500" },
-          { value: "no_definido", label: "Todavía no lo definí" },
-        ],
+        code: "superficie_promedio_m2",
+        label: "Superficie promedio por lote en m2",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 1500",
       },
       {
-        code: "margen_conocido",
-        label: "¿Conoces el margen de contribución por unidad vendida?",
-        type: "radio",
-        required: true,
-        options: [
-          { value: "si_calculado", label: "Sí, está calculado" },
-          { value: "aproximado", label: "Tengo una estimación" },
-          { value: "no", label: "No lo tengo" },
-        ],
+        code: "lotes_total_masterplan",
+        label: "Total de lotes previstos en el masterplan completo",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 420",
       },
       {
-        code: "precio_validado",
-        label: "¿El precio fue validado con clientes reales?",
-        type: "radio",
-        required: true,
-        options: [
-          { value: "si", label: "Sí, ya vendí a ese precio" },
-          { value: "parcial", label: "Solo con pruebas o consultas" },
-          { value: "no", label: "No, es un precio teórico" },
-        ],
+        code: "lotes_disponibles_hoy",
+        label: "Lotes disponibles para vender hoy",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 80",
       },
       {
-        code: "capacidad_produccion",
-        label: "Capacidad de producción o atención actual",
-        help: "Volumen mensual que puedes sostener hoy sin sumar recursos.",
-        type: "textarea",
-        maxLength: 800,
-        placeholder: "Ej: 120 unidades por mes con el equipo actual",
+        code: "lotes_con_instrumento",
+        label: "Lotes con boleto o escritura firmada",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 12",
+      },
+      {
+        code: "lotes_reservados_sin_instrumento",
+        label: "Lotes reservados sin instrumento firmado",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 5",
+      },
+      {
+        code: "lanzamiento_primera_etapa",
+        label: "Mes y año objetivo para lanzar la venta de la primera etapa",
+        type: "text",
+        half: true,
+        maxLength: 60,
+        placeholder: "Ej: marzo 2027",
+      },
+      {
+        code: "lotes_primera_etapa",
+        label: "Cantidad de lotes de esa primera etapa",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 60",
+      },
+      {
+        code: "plano_comercial_file",
+        label: "Plano comercial",
+        help: "Plano de subdivisión o masterplan con lotes identificados, si existe. PDF, imagen o DWG, hasta 50 MB.",
+        type: "file",
+        fileTipo: "plano_comercial",
+        accept: ".pdf,.png,.jpg,.jpeg,.webp,.dwg,.dxf",
       },
     ],
   },
   {
-    key: "digital",
-    title: "Digital, marca y reservas",
+    key: "marca",
+    title: "Marca, web y gestión de interesados",
     eyebrow: "Bloque 03",
     icon: "Globe",
     questions: [
       {
-        code: "tiene_web",
-        label: "¿Tienes sitio web propio?",
+        code: "nombre_estado",
+        label: "El nombre actual del proyecto es",
         type: "radio",
-        required: true,
         options: [
-          { value: "si_activo", label: "Sí, activo y actualizado" },
-          { value: "si_desactualizado", label: "Sí, pero desactualizado" },
-          { value: "no", label: "No tengo" },
+          { value: "definitivo", label: "Definitivo" },
+          { value: "provisorio", label: "Provisorio" },
+          { value: "abierto", label: "Abierto a propuesta profesional" },
         ],
       },
       {
-        code: "canales_digitales",
-        label: "Canales digitales activos",
-        help: "Selecciona todos los que uses hoy.",
+        code: "identidad_visual",
+        label: "Identidad visual",
+        type: "radio",
+        options: [
+          { value: "manual", label: "Logo y manual de marca definidos" },
+          { value: "solo_logo", label: "Solo logo" },
+          { value: "sin_identidad", label: "Sin identidad definida" },
+        ],
+      },
+      {
+        code: "web_estado",
+        label: "Web",
+        type: "radio",
+        options: [
+          { value: "sin_web", label: "No hay web ni dominio" },
+          { value: "dominio", label: "Dominio comprado sin web" },
+          { value: "publicada", label: "Hay web publicada" },
+        ],
+      },
+      {
+        code: "web_url",
+        label: "URL del dominio o de la web",
+        type: "text",
+        maxLength: 200,
+        placeholder: "https://",
+        showIf: { code: "web_estado", values: ["dominio", "publicada"] },
+      },
+      {
+        code: "redes_activas",
+        label: "Redes sociales activas del proyecto",
         type: "multi",
         options: [
           { value: "instagram", label: "Instagram" },
-          { value: "facebook", label: "Facebook" },
-          { value: "tiktok", label: "TikTok" },
           { value: "linkedin", label: "LinkedIn" },
-          { value: "whatsapp", label: "WhatsApp Business" },
-          { value: "marketplace", label: "Marketplaces" },
-          { value: "ninguno", label: "Ninguno" },
+          { value: "facebook", label: "Facebook" },
+          { value: "youtube", label: "YouTube" },
+          { value: "ninguna", label: "Ninguna" },
         ],
       },
       {
-        code: "identidad_marca",
-        label: "Estado de la identidad de marca",
+        code: "gestiona_comunicacion",
+        label: "Quién gestiona hoy la comunicación del proyecto",
+        type: "text",
+        maxLength: 200,
+        placeholder: "Nombre, rol o \"nadie\"",
+      },
+      {
+        code: "registro_interesados",
+        label: "Cómo se registran hoy los interesados en comprar",
         type: "radio",
-        required: true,
         options: [
-          { value: "manual", label: "Manual de marca completo" },
-          { value: "logo", label: "Solo logo" },
-          { value: "nada", label: "Sin identidad definida" },
+          { value: "whatsapp", label: "WhatsApp" },
+          { value: "excel", label: "Planilla Excel" },
+          { value: "correo", label: "Correo" },
+          { value: "inmobiliaria", label: "Inmobiliaria externa" },
+          { value: "no_se_registran", label: "No se registran" },
         ],
       },
       {
-        code: "sistema_reservas",
-        label: "¿Gestionas reservas o turnos?",
+        code: "puede_tomar_sena",
+        label: "Hoy se puede tomar una seña o reserva formal",
         type: "radio",
-        required: true,
         options: [
-          { value: "sistema", label: "Sí, con un sistema" },
-          { value: "manual", label: "Sí, de forma manual" },
-          { value: "no_aplica", label: "No aplica a mi negocio" },
+          { value: "si", label: "Sí" },
+          { value: "no", label: "No" },
+          { value: "depende", label: "Depende del caso" },
         ],
       },
       {
-        code: "plano_comercial_file",
-        label: "Plano o layout comercial",
-        help: "PDF o imagen del local, stand o distribución. Opcional.",
-        type: "file",
-        fileTipo: "plano_comercial",
-        accept: ".pdf,.png,.jpg,.jpeg,.webp",
+        code: "instrumento_reserva",
+        label: "Instrumento que se firma ante una reserva",
+        type: "text",
+        maxLength: 200,
+        placeholder: "Ej: boleto de reserva, o \"ninguno\"",
+      },
+      {
+        code: "material_comercial",
+        label: "Material comercial disponible",
+        type: "multi",
+        options: [
+          { value: "fotos", label: "Fotos profesionales" },
+          { value: "video_drone", label: "Video drone" },
+          { value: "renders", label: "Renders 3D" },
+          { value: "carpeta_venta", label: "Carpeta de venta" },
+          { value: "textos_ingles", label: "Textos en inglés" },
+          { value: "nada", label: "Nada listo" },
+        ],
       },
     ],
   },
   {
     key: "capital",
-    title: "Capital y habilitaciones",
+    title: "Capital, gestión y habilitaciones",
     eyebrow: "Bloque 04",
     icon: "Landmark",
     questions: [
       {
-        code: "capital_disponible",
-        label: "Capital disponible para ejecutar",
+        code: "carpeta_inversores",
+        label: "Carpeta para inversores",
         type: "radio",
-        required: true,
         options: [
-          { value: "menos_5k", label: "Menos de USD 5.000" },
-          { value: "5k_15k", label: "USD 5.000 a 15.000" },
-          { value: "15k_50k", label: "USD 15.000 a 50.000" },
-          { value: "mas_50k", label: "Más de USD 50.000" },
-          { value: "sin_definir", label: "Sin definir" },
+          { value: "completa", label: "Completa con proyecciones financieras" },
+          { value: "visual", label: "Solo presentación visual" },
+          { value: "no_existe", label: "No existe" },
         ],
       },
       {
-        code: "financiamiento_externo",
-        label: "¿Buscas financiamiento externo?",
+        code: "flujo_fondos_etapa",
+        label: "Incluye flujo de fondos proyectado por etapa",
         type: "radio",
-        required: true,
+        options: SI_PARCIAL_NO,
+      },
+      {
+        code: "capex_tir_payback",
+        label: "Incluye CAPEX por etapa, TIR y payback",
+        type: "radio",
+        options: SI_PARCIAL_NO,
+      },
+      {
+        code: "capital_buscado_usd",
+        label: "Monto de capital que se busca en USD",
+        type: "number",
+        half: true,
+        placeholder: "Ej: 3500000",
+      },
+      {
+        code: "capital_para_etapa",
+        label: "Para qué etapa",
+        type: "text",
+        half: true,
+        maxLength: 200,
+        placeholder: "Ej: infraestructura etapa 1",
+      },
+      {
+        code: "inversores_conversacion",
+        label: "Inversores en conversación activa",
+        type: "radio",
         options: [
-          { value: "no", label: "No, capital propio" },
-          { value: "en_gestion", label: "En gestión" },
-          { value: "si_obtenido", label: "Sí, ya obtenido" },
+          { value: "si", label: "Sí" },
+          { value: "contactos", label: "Hubo contactos sin avanzar" },
+          { value: "no", label: "No" },
         ],
       },
       {
-        code: "habilitaciones",
-        label: "Estado de habilitaciones y permisos",
+        code: "mensura_subdivision",
+        label: "Estado de la mensura de subdivisión",
         type: "radio",
-        required: true,
         options: [
-          { value: "completas", label: "Completas" },
+          { value: "aprobada", label: "Aprobada e inscripta" },
           { value: "en_tramite", label: "En trámite" },
-          { value: "no_iniciadas", label: "No iniciadas" },
-          { value: "no_aplica", label: "No aplica" },
+          { value: "no_iniciada", label: "No iniciada" },
         ],
       },
       {
-        code: "plazo_apertura",
-        label: "Plazo objetivo de lanzamiento o apertura",
-        type: "radio",
-        required: true,
+        code: "aprobaciones_vigentes",
+        label: "Aprobaciones vigentes hoy",
+        type: "multi",
         options: [
-          { value: "1_mes", label: "Dentro de 1 mes" },
-          { value: "3_meses", label: "Dentro de 3 meses" },
-          { value: "6_meses", label: "Dentro de 6 meses" },
-          { value: "mas_6", label: "Más de 6 meses" },
+          { value: "urbanistico", label: "Certificado urbanístico" },
+          { value: "ambiental", label: "Habilitación ambiental" },
+          { value: "arqueologico", label: "Estudio de impacto arqueológico" },
+          { value: "turismo", label: "Aval de turismo" },
+          { value: "ninguna", label: "Ninguna vigente" },
+          { value: "no_se", label: "No sé" },
         ],
+      },
+      {
+        code: "falta_para_escriturar",
+        label: "Qué falta para poder escriturar un lote",
+        type: "textarea",
+        maxLength: 1500,
+        placeholder: "Trámites pendientes, plazos, responsables",
+      },
+      {
+        code: "coordina_avance",
+        label: "Quién coordina hoy el avance general del proyecto",
+        type: "text",
+        maxLength: 200,
+        placeholder: "Nombre y rol, o \"nadie asignado\"",
+      },
+      {
+        code: "cronograma",
+        label: "Existe cronograma de obra y de ventas",
+        type: "radio",
+        options: [
+          { value: "si_documentado", label: "Sí documentado" },
+          { value: "parcial", label: "Parcial" },
+          { value: "no", label: "No" },
+        ],
+      },
+      {
+        code: "decisor_marca_web",
+        label: "Quién decide sobre marca, web y estrategia comercial",
+        type: "text",
+        maxLength: 200,
+        placeholder: "Nombre y rol",
       },
     ],
   },
@@ -231,49 +386,76 @@ export const STEPS: Step[] = [
     icon: "Leaf",
     questions: [
       {
-        code: "practicas_sostenibles",
-        label: "Prácticas sostenibles ya implementadas",
+        code: "acciones_ejecutadas",
+        label: "Acciones ya ejecutadas en el terreno",
         type: "multi",
         options: [
-          { value: "residuos", label: "Gestión de residuos" },
-          { value: "energia", label: "Eficiencia energética" },
-          { value: "proveedores", label: "Proveedores locales" },
-          { value: "packaging", label: "Packaging responsable" },
-          { value: "impacto_social", label: "Impacto social" },
-          { value: "ninguna", label: "Ninguna todavía" },
+          { value: "revegetacion", label: "Revegetación con especies nativas" },
+          { value: "laguna", label: "Formación de laguna" },
+          { value: "pozos_agua", label: "Pozos de agua" },
+          { value: "top_soil", label: "Manejo de top soil" },
+          { value: "dunas", label: "Restauración de dunas" },
+          { value: "accesos", label: "Apertura de accesos" },
+          { value: "otras", label: "Otras" },
+          { value: "ninguna", label: "Ninguna" },
         ],
       },
       {
-        code: "medicion_impacto",
-        label: "¿Mides el impacto de esas prácticas?",
+        code: "cifras_medidas",
+        label: "Hay cifras medidas de esas acciones",
         type: "radio",
-        required: true,
         options: [
-          { value: "si_indicadores", label: "Sí, con indicadores" },
-          { value: "informal", label: "De forma informal" },
-          { value: "no", label: "No lo mido" },
+          { value: "si_numeros", label: "Sí, con números" },
+          { value: "estimado", label: "Solo estimado" },
+          { value: "no_medido", label: "No se midió" },
         ],
       },
       {
-        code: "sostenibilidad_file",
-        label: "Informe o certificación de sostenibilidad",
-        help: "Adjunta el documento si lo tienes. Opcional.",
-        type: "file",
-        fileTipo: "sostenibilidad",
-        accept: ".pdf,.png,.jpg,.jpeg,.webp",
+        code: "documentacion_existente",
+        label: "Documentación existente",
+        type: "multi",
+        options: [
+          { value: "fotos_fechadas", label: "Fotos fechadas" },
+          { value: "informes_firmados", label: "Informes técnicos firmados" },
+          { value: "mediciones_terceros", label: "Mediciones de terceros" },
+          { value: "permisos_ambientales", label: "Permisos ambientales" },
+          { value: "ninguna", label: "Ninguna" },
+        ],
       },
       {
-        code: "comentarios",
-        label: "Algo más que debamos saber",
+        code: "detalle_acciones",
+        label: "Detalle de qué se hizo y en qué fechas",
         type: "textarea",
-        maxLength: 1500,
-        placeholder: "Contexto, restricciones, objetivos del próximo trimestre",
+        maxLength: 2000,
+        placeholder: "Acción, superficie o volumen, fecha, responsable",
+      },
+      {
+        code: "interes_impacto_medido",
+        label:
+          "Interés en mostrar impacto medido y verificable a inversores e instituciones",
+        type: "radio",
+        options: [
+          { value: "prioritario", label: "Sí, es prioritario" },
+          { value: "mas_adelante", label: "Sí, más adelante" },
+          { value: "a_evaluar", label: "A evaluar" },
+        ],
+      },
+      {
+        code: "sostenibilidad_files",
+        label: "Adjuntar informes o registros",
+        help: "Puedes subir varios archivos, hasta 50 MB cada uno.",
+        type: "files",
+        fileTipo: "sostenibilidad",
+        multiple: true,
+        accept: ".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx",
       },
     ],
   },
 ];
 
 export const TOTAL_STEPS = STEPS.length;
+
+export const MAX_FILE_MB = 50;
 
 export const progressForStep = (stepIndex: number) =>
   Math.round(((stepIndex + 1) / TOTAL_STEPS) * 100);
@@ -292,6 +474,6 @@ export const initialContact: ContactState = {
   apellido: "",
   rol_proyecto: "",
   email: "",
-  telefono: "+598 ",
+  telefono: "",
   nombre_proyecto: "",
 };
