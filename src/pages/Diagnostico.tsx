@@ -641,26 +641,53 @@ const Diagnostico = () => {
                         />
                       )}
 
-                      {q.type === "file" && (
-                        <div className="border border-dashed border-border p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                          <label className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.15em] font-['Space_Grotesk'] text-foreground cursor-pointer border border-border px-4 py-3 hover:border-accent transition-colors">
-                            <Icon
-                              name={uploading === q.code ? "Loader2" : "Upload"}
-                              size={14}
-                              className={uploading === q.code ? "animate-spin" : ""}
-                            />
-                            Adjuntar
-                            <input
-                              type="file"
-                              className="hidden"
-                              accept={q.accept}
-                              disabled={uploading === q.code}
-                              onChange={(e) => handleFile(q, e.target.files?.[0] ?? null)}
-                            />
-                          </label>
-                          <span className="text-xs text-muted-foreground break-all min-w-0">
-                            {files[q.code]?.name ?? "PDF o imagen, hasta 10 MB"}
-                          </span>
+                      {(q.type === "text" || q.type === "number") && (
+                        <TextField
+                          type={q.type === "number" ? "number" : "text"}
+                          value={(answers[q.code] as string) ?? ""}
+                          maxLength={q.maxLength}
+                          placeholder={q.placeholder}
+                          error={errors[q.code]}
+                          onChange={(v) => setAnswer(q.code, v)}
+                        />
+                      )}
+
+                      {(q.type === "file" || q.type === "files") && (
+                        <div className="border border-dashed border-border p-4 space-y-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <label className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.15em] font-['Space_Grotesk'] text-foreground cursor-pointer border border-border px-4 py-3 hover:border-accent transition-colors">
+                              <Icon
+                                name={uploading === q.code ? "Loader2" : "Upload"}
+                                size={14}
+                                className={uploading === q.code ? "animate-spin" : ""}
+                              />
+                              Adjuntar
+                              <input
+                                type="file"
+                                className="hidden"
+                                accept={q.accept}
+                                multiple={q.multiple}
+                                disabled={uploading === q.code}
+                                onChange={(e) => handleFiles(q, e.target.files)}
+                              />
+                            </label>
+                            <span className="text-xs text-muted-foreground min-w-0">
+                              Hasta {MAX_FILE_MB} MB por archivo
+                            </span>
+                          </div>
+                          {(files[q.code] ?? []).length > 0 && (
+                            <ul className="space-y-1.5">
+                              {(files[q.code] ?? []).map((f) => (
+                                <li
+                                  key={f.path}
+                                  className="flex items-start gap-2 text-xs text-foreground break-all"
+                                >
+                                  <Icon name="Paperclip" size={12} className="mt-0.5 text-accent" />
+                                  <span className="min-w-0">{f.name}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       )}
 
