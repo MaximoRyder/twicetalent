@@ -6,28 +6,38 @@
 type Dict = Record<string, string>;
 
 const es: Dict = {
-  "diagnostico.meta.title": "Diagnóstico de Proyecto | Twice Talent",
+  "diagnostico.meta.title": "Diagnóstico de Desarrollo | Twice Talent",
   "diagnostico.meta.description":
-    "Completa el diagnóstico inicial de tu proyecto: producto, precio, presencia digital, capital y sostenibilidad. Respuesta en 48 horas.",
+    "Relevamiento del desarrollo inmobiliario: lotes y precios, marca y web, capital y habilitaciones, sostenibilidad.",
   "diagnostico.eyebrow": "Diagnóstico",
-  "diagnostico.title": "Diagnóstico de proyecto",
+  "diagnostico.title": "Diagnóstico del desarrollo",
   "diagnostico.subtitle":
-    "Cinco bloques cortos. Se guarda a medida que avanzas, puedes retomarlo cuando quieras.",
+    "Cinco bloques. Se guarda a medida que avanzas y puedes retomarlo cuando quieras.",
   "diagnostico.progress": "Progreso",
   "diagnostico.saving": "Guardando",
   "diagnostico.saved": "Guardado",
   "diagnostico.back": "Anterior",
   "diagnostico.next": "Continuar",
   "diagnostico.submit": "Enviar diagnóstico",
+  "diagnostico.later": "Continuar después",
+  "diagnostico.later.title": "Link para retomar",
+  "diagnostico.later.body":
+    "Guarda este link. Con él puedes retomar el formulario donde lo dejaste.",
+  "diagnostico.later.copy": "Copiar link",
+  "diagnostico.later.copied": "Link copiado",
+  "diagnostico.later.needContact":
+    "Completa nombre, apellido, email y nombre del proyecto para generar el link.",
   "diagnostico.required": "Requerido",
   "diagnostico.optional": "Opcional",
+  "diagnostico.file.max": "El archivo supera los 50 MB",
+  "diagnostico.file.attached": "Archivo adjuntado",
   "diagnostico.error.generic": "No pudimos guardar. Intenta nuevamente.",
   "diagnostico.error.email": "Email inválido",
 
   "diagnostico.step.contacto": "Contacto",
-  "diagnostico.step.producto": "Producto y precio",
-  "diagnostico.step.digital": "Digital, marca y reservas",
-  "diagnostico.step.capital": "Capital y habilitaciones",
+  "diagnostico.step.lotes": "Lotes y precios",
+  "diagnostico.step.marca": "Marca, web y gestión de interesados",
+  "diagnostico.step.capital": "Capital, gestión y habilitaciones",
   "diagnostico.step.sostenibilidad": "Sostenibilidad",
 
   "diagnostico.field.nombre": "Nombre",
@@ -37,9 +47,9 @@ const es: Dict = {
   "diagnostico.field.telefono": "Teléfono",
   "diagnostico.field.proyecto": "Nombre del proyecto",
 
-  "diagnostico.done.title": "Diagnóstico recibido",
+  "diagnostico.done.title": "Recibimos la información",
   "diagnostico.done.body":
-    "Ya tenemos tu información. Revisamos cada caso a mano y respondemos dentro de las 48 horas hábiles.",
+    "En los próximos días presentamos un diagnóstico con las prioridades detectadas y las opciones de trabajo por etapas.",
   "diagnostico.done.ref": "Referencia",
   "diagnostico.done.home": "Volver al inicio",
 

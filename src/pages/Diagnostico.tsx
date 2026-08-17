@@ -10,6 +10,7 @@ import {
   STEPS,
   TOTAL_STEPS,
   ROLES_PROYECTO,
+  MAX_FILE_MB,
   initialContact,
   progressForStep,
   type ContactState,
@@ -21,15 +22,17 @@ import {
   submitDiagnostic,
   uploadDiagnosticFile,
   addFileRecord,
+  resumeDiagnostic,
   type DiagnosticSession,
   type AnswerPayload,
 } from "@/lib/diagnosticoApi";
 
-const LS_KEY = "tt_diagnostico_v1";
+const LS_KEY = "tt_diagnostico_v2";
 const easing = [0.16, 1, 0.3, 1] as const;
 
 type AnswerMap = Record<string, string | string[]>;
-type FileMap = Record<string, { name: string; path: string }>;
+type UploadedFile = { name: string; path: string };
+type FileMap = Record<string, UploadedFile[]>;
 
 interface Persisted {
   sessionKey: string;
@@ -155,11 +158,60 @@ const Diagnostico = () => {
   const [uploading, setUploading] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [ref, setRef] = useState<string | null>(null);
+  const [resumeLink, setResumeLink] = useState<string | null>(null);
+
+  /** Guarda lo cargado y devuelve el link para retomar (estado P) */
+  const handleLater = async () => {
+    setBusy(true);
+    try {
+      const s = await ensureSession();
+      if (!s) {
+        toast.error(t("diagnostico.later.needContact"));
+        setStep(0);
+        return;
+      }
+      await saveStep(
+        sessionKey,
+        s.resume_token,
+        Math.max(step, 1),
+        answersForStep(STEPS[Math.max(step, 1)].questions),
+        progressForStep(step)
+      );
+      setResumeLink(`${window.location.origin}/diagnostico?r=${s.resume_token}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
+    } finally {
+      setBusy(false);
+    }
+  };
 
   useEffect(() => {
     document.title = t("diagnostico.meta.title");
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute("content", t("diagnostico.meta.description"));
+  }, []);
+
+  /** Retomar desde link: /diagnostico?r=<resume_token> */
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("r");
+    if (!token) return;
+    (async () => {
+      try {
+        const d = await resumeDiagnostic(token);
+        setSession({ id: d.id, resume_token: d.resume_token, estado: d.estado });
+        setContact({ ...initialContact, ...d.contacto });
+        const allQuestions = STEPS.flatMap((s) => s.questions);
+        const map: AnswerMap = {};
+        d.answers.forEach((a) => {
+          const q = allQuestions.find((x) => x.code === a.question_code);
+          const raw = a.answer_text ?? a.answer_value ?? "";
+          map[a.question_code] = q?.type === "multi" ? raw.split(",").filter(Boolean) : raw;
+        });
+        setAnswers((prev) => ({ ...map, ...prev }));
+      } catch {
+        /* token invalido: se continua con el estado local */
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -190,32 +242,65 @@ const Diagnostico = () => {
   };
 
 
+  /** Una pregunta condicional solo cuenta si su condicion se cumple */
+  const isVisible = useCallback(
+    (question: Question) => {
+      if (!question.showIf) return true;
+      const v = answers[question.showIf.code];
+      const val = Array.isArray(v) ? v : [v ?? ""];
+      return val.some((x) => question.showIf!.values.includes(String(x)));
+    },
+    [answers]
+  );
+
   const answersForStep = (q: Question[]): AnswerPayload[] =>
     q
-      .filter((question) => question.type !== "file")
+      .filter((question) => question.type !== "file" && question.type !== "files")
+      .filter(isVisible)
       .map((question) => {
         const v = answers[question.code];
-        if (v === undefined) return null;
+        if (v === undefined || v === "") return null;
         return {
           question_code: question.code,
           answer_value: Array.isArray(v) ? v.join(",") : v,
-          answer_text: question.type === "textarea" || question.type === "text" ? String(v) : null,
+          answer_text:
+            question.type === "textarea" || question.type === "text" ? String(v) : null,
         };
       })
       .filter(Boolean) as AnswerPayload[];
 
-  const handleFile = async (question: Question, file: File | null) => {
-    if (!file || !session) return;
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("El archivo supera los 10 MB");
+  /** Crea la sesion en backend si el contacto minimo esta completo */
+  const ensureSession = async (): Promise<DiagnosticSession | null> => {
+    if (session) return session;
+    if (missingForStep(0).length > 0) return null;
+    const s = await startDiagnostic(sessionKey, contact);
+    setSession(s);
+    return s;
+  };
+
+  const handleFiles = async (question: Question, list: FileList | null) => {
+    if (!list || list.length === 0) return;
+    const s = await ensureSession();
+    if (!s) {
+      toast.error(t("diagnostico.later.needContact"));
       return;
     }
     setUploading(question.code);
     try {
-      const path = await uploadDiagnosticFile(session.id, question.fileTipo!, file);
-      await addFileRecord(sessionKey, session.resume_token, question.fileTipo!, path, file.name);
-      setFiles((f) => ({ ...f, [question.code]: { name: file.name, path } }));
-      toast.success("Archivo adjuntado");
+      for (const file of Array.from(list)) {
+        if (file.size > MAX_FILE_MB * 1024 * 1024) {
+          toast.error(t("diagnostico.file.max"));
+          continue;
+        }
+        const path = await uploadDiagnosticFile(s.id, question.fileTipo!, file);
+        await addFileRecord(sessionKey, s.resume_token, question.fileTipo!, path, file.name);
+        setFiles((f) => {
+          const prev = f[question.code] ?? [];
+          const next = question.multiple ? [...prev, { name: file.name, path }] : [{ name: file.name, path }];
+          return { ...f, [question.code]: next };
+        });
+      }
+      toast.success(t("diagnostico.file.attached"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
     } finally {
@@ -572,9 +657,9 @@ const Diagnostico = () => {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-8">
-                  {current.questions.map((q) => (
-                    <div key={q.code}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-8">
+                  {current.questions.filter(isVisible).map((q) => (
+                    <div key={q.code} className={q.half ? "sm:col-span-1" : "sm:col-span-2"}>
                       <FieldLabel required={q.required}>{q.label}</FieldLabel>
                       {q.help && (
                         <p className="text-xs text-muted-foreground mb-3 -mt-1 break-words">{q.help}</p>
@@ -620,26 +705,53 @@ const Diagnostico = () => {
                         />
                       )}
 
-                      {q.type === "file" && (
-                        <div className="border border-dashed border-border p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                          <label className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.15em] font-['Space_Grotesk'] text-foreground cursor-pointer border border-border px-4 py-3 hover:border-accent transition-colors">
-                            <Icon
-                              name={uploading === q.code ? "Loader2" : "Upload"}
-                              size={14}
-                              className={uploading === q.code ? "animate-spin" : ""}
-                            />
-                            Adjuntar
-                            <input
-                              type="file"
-                              className="hidden"
-                              accept={q.accept}
-                              disabled={uploading === q.code}
-                              onChange={(e) => handleFile(q, e.target.files?.[0] ?? null)}
-                            />
-                          </label>
-                          <span className="text-xs text-muted-foreground break-all min-w-0">
-                            {files[q.code]?.name ?? "PDF o imagen, hasta 10 MB"}
-                          </span>
+                      {(q.type === "text" || q.type === "number") && (
+                        <TextField
+                          type={q.type === "number" ? "number" : "text"}
+                          value={(answers[q.code] as string) ?? ""}
+                          maxLength={q.maxLength}
+                          placeholder={q.placeholder}
+                          error={errors[q.code]}
+                          onChange={(v) => setAnswer(q.code, v)}
+                        />
+                      )}
+
+                      {(q.type === "file" || q.type === "files") && (
+                        <div className="border border-dashed border-border p-4 space-y-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <label className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.15em] font-['Space_Grotesk'] text-foreground cursor-pointer border border-border px-4 py-3 hover:border-accent transition-colors">
+                              <Icon
+                                name={uploading === q.code ? "Loader2" : "Upload"}
+                                size={14}
+                                className={uploading === q.code ? "animate-spin" : ""}
+                              />
+                              Adjuntar
+                              <input
+                                type="file"
+                                className="hidden"
+                                accept={q.accept}
+                                multiple={q.multiple}
+                                disabled={uploading === q.code}
+                                onChange={(e) => handleFiles(q, e.target.files)}
+                              />
+                            </label>
+                            <span className="text-xs text-muted-foreground min-w-0">
+                              Hasta {MAX_FILE_MB} MB por archivo
+                            </span>
+                          </div>
+                          {(files[q.code] ?? []).length > 0 && (
+                            <ul className="space-y-1.5">
+                              {(files[q.code] ?? []).map((f) => (
+                                <li
+                                  key={f.path}
+                                  className="flex items-start gap-2 text-xs text-foreground break-all"
+                                >
+                                  <Icon name="Paperclip" size={12} className="mt-0.5 text-accent" />
+                                  <span className="min-w-0">{f.name}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       )}
 
@@ -659,15 +771,46 @@ const Diagnostico = () => {
                 ) : (
                   <span className="hidden sm:block" />
                 )}
-                <AppButton
-                  onClick={goNext}
-                  loading={busy}
-                  iconRight={step === TOTAL_STEPS - 1 ? "Check" : "ArrowRight"}
-                  className="w-full sm:w-auto"
-                >
-                  {step === TOTAL_STEPS - 1 ? t("diagnostico.submit") : t("diagnostico.next")}
-                </AppButton>
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                  <AppButton
+                    variant="secondary"
+                    iconLeft="Clock"
+                    onClick={handleLater}
+                    disabled={busy}
+                    className="w-full sm:w-auto"
+                  >
+                    {t("diagnostico.later")}
+                  </AppButton>
+                  <AppButton
+                    onClick={goNext}
+                    loading={busy}
+                    iconRight={step === TOTAL_STEPS - 1 ? "Check" : "ArrowRight"}
+                    className="w-full sm:w-auto"
+                  >
+                    {step === TOTAL_STEPS - 1 ? t("diagnostico.submit") : t("diagnostico.next")}
+                  </AppButton>
+                </div>
               </div>
+
+              {resumeLink && (
+                <div className="mt-6 border border-accent/40 bg-accent/5 p-4">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-accent font-['Space_Grotesk'] mb-2">
+                    {t("diagnostico.later.title")}
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-3">{t("diagnostico.later.body")}</p>
+                  <p className="text-xs text-foreground break-all font-mono mb-3">{resumeLink}</p>
+                  <AppButton
+                    variant="secondary"
+                    iconLeft="Copy"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(resumeLink);
+                      toast.success(t("diagnostico.later.copied"));
+                    }}
+                  >
+                    {t("diagnostico.later.copy")}
+                  </AppButton>
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </section>
