@@ -667,7 +667,10 @@ const Diagnostico = () => {
                       <FieldLabel required>{t("diagnostico.field.nombre")}</FieldLabel>
                       <TextField
                         value={contact.nombre}
-                        onChange={(v) => setContact({ ...contact, nombre: v })}
+                        onChange={(v) => {
+                          setContact({ ...contact, nombre: v });
+                          setErrors((e) => ({ ...e, nombre: "" }));
+                        }}
                         error={errors.nombre}
                         maxLength={100}
                         placeholder="Martina"
