@@ -205,6 +205,15 @@ const Diagnostico = () => {
       })
       .filter(Boolean) as AnswerPayload[];
 
+  /** Crea la sesion en backend si el contacto minimo esta completo */
+  const ensureSession = async (): Promise<DiagnosticSession | null> => {
+    if (session) return session;
+    if (missingForStep(0).length > 0) return null;
+    const s = await startDiagnostic(sessionKey, contact);
+    setSession(s);
+    return s;
+  };
+
   const handleFiles = async (question: Question, list: FileList | null) => {
     if (!list || list.length === 0) return;
     const s = await ensureSession();
