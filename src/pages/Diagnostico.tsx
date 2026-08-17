@@ -310,7 +310,25 @@ const Diagnostico = () => {
     [contact, answers, isVisible]
   );
 
-  /** Persiste lo que haya del paso actual, sin bloquear la navegacion */
+  const allMissingByStep = useCallback(() => {
+    return STEPS.map((s, i) => ({
+      i,
+      key: s.key,
+      title: s.title,
+      missing: missingForStep(i),
+    })).filter((x) => x.missing.length > 0);
+  }, [missingForStep]);
+
+  const buildAllErrors = (): Record<string, string> => {
+    const e: Record<string, string> = {};
+    allMissingByStep().forEach((x) => {
+      x.missing.forEach((c) => {
+        e[c] = c === "email" ? t("diagnostico.error.email") : t("diagnostico.required");
+      });
+    });
+    return e;
+  };
+
   const persistCurrent = async (index: number) => {
     try {
       if (index === 0) {
@@ -338,7 +356,11 @@ const Diagnostico = () => {
     setBusy(true);
     try {
       await persistCurrent(step);
-      setErrors({});
+      setErrors((prev) => {
+        // mantener errores globales si el resumen esta activo, limpiar solo el del campo seleccionado
+        if (showSummary) return prev;
+        return {};
+      });
       setStep(target);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
@@ -351,25 +373,18 @@ const Diagnostico = () => {
       await goToStep(step + 1);
       return;
     }
-    // ultimo paso: recien aca validamos todo
+    // ultimo paso: validamos todo
     setBusy(true);
     try {
       await persistCurrent(step);
-      const incomplete = STEPS.map((_, i) => ({ i, missing: missingForStep(i) })).filter(
-        (x) => x.missing.length > 0
-      );
+      const incomplete = allMissingByStep();
       if (incomplete.length > 0) {
-        const first = incomplete[0];
-        const e: Record<string, string> = {};
-        first.missing.forEach((c) => {
-          e[c] = c === "email" ? t("diagnostico.error.email") : t("diagnostico.required");
-        });
+        const e = buildAllErrors();
         setErrors(e);
-        setStep(first.i);
+        setShowSummary(true);
+        setStep(0);
         window.scrollTo({ top: 0, behavior: "smooth" });
-        toast.error(
-          `Faltan campos en: ${incomplete.map((x) => STEPS[x.i].title).join(", ")}`
-        );
+        toast.error(`Faltan ${incomplete.reduce((acc, x) => acc + x.missing.length, 0)} campos por completar`);
         return;
       }
       let s = session;
@@ -400,10 +415,14 @@ const Diagnostico = () => {
   };
 
   const goBack = () => {
-    setErrors({});
+    setErrors((prev) => {
+      if (showSummary) return prev;
+      return {};
+    });
     setStep((s) => Math.max(0, s - 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
 
   const stepList = useMemo(
     () => STEPS.map((s, i) => ({ ...s, index: i, complete: missingForStep(i).length === 0 })),
