@@ -158,6 +158,8 @@ const Diagnostico = () => {
   const [uploading, setUploading] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [ref, setRef] = useState<string | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
+
 
   useEffect(() => {
     document.title = t("diagnostico.meta.title");
