@@ -27,6 +27,9 @@ const es: Dict = {
   "diagnostico.later.copied": "Link copiado",
   "diagnostico.later.needContact":
     "Completa nombre, apellido, email y nombre del proyecto para generar el link.",
+  "diagnostico.recovered":
+    "Recuperamos tu avance anterior. Puedes continuar desde donde quedaste.",
+  "diagnostico.later.close": "Cerrar",
   "diagnostico.required": "Requerido",
   "diagnostico.optional": "Opcional",
   "diagnostico.file.max": "El archivo supera los 50 MB",

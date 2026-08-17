@@ -159,7 +159,11 @@ const Diagnostico = () => {
   const [done, setDone] = useState(false);
   const [ref, setRef] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
-
+  const [recovered, setRecovered] = useState(false);
+  const [laterOpen, setLaterOpen] = useState(false);
+  const [focusPending, setFocusPending] = useState(false);
+  const dirtyRef = useRef(false);
+  const savingRef = useRef(false);
 
   useEffect(() => {
     document.title = t("diagnostico.meta.title");
@@ -167,13 +171,18 @@ const Diagnostico = () => {
     if (meta) meta.setAttribute("content", t("diagnostico.meta.description"));
   }, []);
 
-  /** Retomar desde link: /diagnostico?r=<resume_token> */
+  /**
+   * Recuperacion de sesion: token de la URL (/diagnostico?r=<token>) o token
+   * persistido en el navegador. El backend es la fuente de verdad.
+   */
   useEffect(() => {
-    const token = new URLSearchParams(window.location.search).get("r");
+    const urlToken = new URLSearchParams(window.location.search).get("r");
+    const token = urlToken ?? bootRef.current.session?.resume_token ?? null;
     if (!token) return;
     (async () => {
       try {
         const d = await resumeDiagnostic(token);
+        if (d.estado !== "P") return;
         setSession({ id: d.id, resume_token: d.resume_token, estado: d.estado });
         setContact({ ...initialContact, ...d.contacto });
         const allQuestions = STEPS.flatMap((s) => s.questions);
@@ -183,7 +192,9 @@ const Diagnostico = () => {
           const raw = a.answer_text ?? a.answer_value ?? "";
           map[a.question_code] = q?.type === "multi" ? raw.split(",").filter(Boolean) : raw;
         });
-        setAnswers((prev) => ({ ...map, ...prev }));
+        setAnswers((prev) => ({ ...prev, ...map }));
+        setRecovered(true);
+        setFocusPending(true);
       } catch {
         /* token invalido: se continua con el estado local */
       }
@@ -351,6 +362,52 @@ const Diagnostico = () => {
     }
   };
 
+  /** Cambios pendientes de sincronizar con el backend */
+  useEffect(() => {
+    dirtyRef.current = true;
+  }, [answers, contact]);
+
+  /** Bloque 1 completo: se crea el registro (estado P) y su token de sesion */
+  useEffect(() => {
+    if (done || session || savingRef.current) return;
+    if (missingForStep(0).length > 0) return;
+    savingRef.current = true;
+    startDiagnostic(sessionKey, contact)
+      .then(setSession)
+      .catch(() => undefined)
+      .finally(() => {
+        savingRef.current = false;
+      });
+  }, [contact, session, done, sessionKey, missingForStep]);
+
+  /** Autoguardado cada 20 segundos si hubo cambios */
+  useEffect(() => {
+    if (done) return;
+    const id = window.setInterval(async () => {
+      if (!dirtyRef.current || savingRef.current) return;
+      savingRef.current = true;
+      dirtyRef.current = false;
+      try {
+        await persistCurrent(0);
+        if (step > 0) await persistCurrent(step);
+      } catch {
+        dirtyRef.current = true;
+      } finally {
+        savingRef.current = false;
+      }
+    }, 20000);
+    return () => window.clearInterval(id);
+  });
+
+  /** Al recuperar sesion, posicionar en el primer bloque incompleto */
+  useEffect(() => {
+    if (!focusPending) return;
+    const first = STEPS.findIndex((_, i) => missingForStep(i).length > 0);
+    setStep(first === -1 ? TOTAL_STEPS - 1 : first);
+    setFocusPending(false);
+  }, [focusPending, missingForStep]);
+
+
   const goToStep = async (target: number) => {
     if (target === step || busy) return;
     setBusy(true);
@@ -411,6 +468,37 @@ const Diagnostico = () => {
       toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
     } finally {
       setBusy(false);
+    }
+  };
+
+  const resumeLink = session
+    ? `${window.location.origin}/diagnostico?r=${session.resume_token}`
+    : "";
+
+  const handleLater = async () => {
+    setBusy(true);
+    try {
+      const s = await ensureSession();
+      if (!s) {
+        toast.error(t("diagnostico.later.needContact"));
+        return;
+      }
+      await persistCurrent(step);
+      dirtyRef.current = false;
+      setLaterOpen(true);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const copyResumeLink = async () => {
+    try {
+      await navigator.clipboard.writeText(resumeLink);
+      toast.success(t("diagnostico.later.copied"));
+    } catch {
+      toast.error(t("diagnostico.error.generic"));
     }
   };
 
@@ -564,6 +652,24 @@ const Diagnostico = () => {
           />
         </div>
       </header>
+
+      {recovered && (
+        <div className="bg-accent/10 border-b border-accent/40">
+          <div className="px-5 sm:px-8 lg:px-16 py-3 max-w-6xl mx-auto flex items-start gap-3">
+            <Icon name="History" size={16} className="text-accent mt-0.5 shrink-0" />
+            <p className="text-xs sm:text-sm text-foreground break-words">
+              {t("diagnostico.recovered")}
+            </p>
+            <button
+              type="button"
+              onClick={() => setRecovered(false)}
+              className="ml-auto text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground shrink-0"
+            >
+              {t("diagnostico.later.close")}
+            </button>
+          </div>
+        </div>
+      )}
 
       <SummaryPanel />
 
@@ -877,6 +983,15 @@ const Diagnostico = () => {
                 )}
                 <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
                   <AppButton
+                    variant="secondary"
+                    iconLeft="Link2"
+                    onClick={handleLater}
+                    disabled={busy}
+                    className="w-full sm:w-auto"
+                  >
+                    {t("diagnostico.later")}
+                  </AppButton>
+                  <AppButton
                     onClick={goNext}
                     loading={busy}
                     iconRight={step === TOTAL_STEPS - 1 ? "Check" : "ArrowRight"}
@@ -886,6 +1001,40 @@ const Diagnostico = () => {
                   </AppButton>
                 </div>
               </div>
+
+              {laterOpen && resumeLink && (
+                <div className="mt-6 border border-accent/40 bg-accent/5 p-4 sm:p-5">
+                  <div className="flex items-start gap-3 mb-3">
+                    <Icon name="Link2" size={16} className="text-accent mt-0.5 shrink-0" />
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-['Space_Grotesk'] font-medium text-foreground">
+                        {t("diagnostico.later.title")}
+                      </h3>
+                      <p className="text-xs text-muted-foreground break-words">
+                        {t("diagnostico.later.body")}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setLaterOpen(false)}
+                      className="ml-auto text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground shrink-0"
+                    >
+                      {t("diagnostico.later.close")}
+                    </button>
+                  </div>
+                  <p className="text-xs font-mono text-foreground break-all bg-background border border-border p-3 mb-3">
+                    {resumeLink}
+                  </p>
+                  <AppButton
+                    variant="secondary"
+                    iconLeft="Copy"
+                    onClick={copyResumeLink}
+                    className="w-full sm:w-auto"
+                  >
+                    {t("diagnostico.later.copy")}
+                  </AppButton>
+                </div>
+              )}
 
             </motion.div>
           </AnimatePresence>
