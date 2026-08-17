@@ -35,9 +35,9 @@ const es: Dict = {
   "diagnostico.error.email": "Email inválido",
 
   "diagnostico.step.contacto": "Contacto",
-  "diagnostico.step.producto": "Producto y precio",
-  "diagnostico.step.digital": "Digital, marca y reservas",
-  "diagnostico.step.capital": "Capital y habilitaciones",
+  "diagnostico.step.lotes": "Lotes y precios",
+  "diagnostico.step.marca": "Marca, web y gestión de interesados",
+  "diagnostico.step.capital": "Capital, gestión y habilitaciones",
   "diagnostico.step.sostenibilidad": "Sostenibilidad",
 
   "diagnostico.field.nombre": "Nombre",
