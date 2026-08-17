@@ -14,6 +14,168 @@ export type Database = {
   }
   public: {
     Tables: {
+      diagnostic_answers: {
+        Row: {
+          answer_text: string | null
+          answer_value: string | null
+          created_at: string
+          diagnostic_id: string
+          id: string
+          question_code: string
+          step: number
+          updated_at: string
+        }
+        Insert: {
+          answer_text?: string | null
+          answer_value?: string | null
+          created_at?: string
+          diagnostic_id: string
+          id?: string
+          question_code: string
+          step: number
+          updated_at?: string
+        }
+        Update: {
+          answer_text?: string | null
+          answer_value?: string | null
+          created_at?: string
+          diagnostic_id?: string
+          id?: string
+          question_code?: string
+          step?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostic_answers_diagnostic_id_fkey"
+            columns: ["diagnostic_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnostic_audit_log: {
+        Row: {
+          created_at: string
+          diagnostic_id: string | null
+          event: string
+          id: string
+          payload: Json
+          session_key: string | null
+        }
+        Insert: {
+          created_at?: string
+          diagnostic_id?: string | null
+          event: string
+          id?: string
+          payload?: Json
+          session_key?: string | null
+        }
+        Update: {
+          created_at?: string
+          diagnostic_id?: string | null
+          event?: string
+          id?: string
+          payload?: Json
+          session_key?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostic_audit_log_diagnostic_id_fkey"
+            columns: ["diagnostic_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnostic_files: {
+        Row: {
+          created_at: string
+          diagnostic_id: string
+          file_name: string | null
+          id: string
+          storage_path: string
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          diagnostic_id: string
+          file_name?: string | null
+          id?: string
+          storage_path: string
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          diagnostic_id?: string
+          file_name?: string | null
+          id?: string
+          storage_path?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostic_files_diagnostic_id_fkey"
+            columns: ["diagnostic_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnostics: {
+        Row: {
+          apellido: string
+          created_at: string
+          email: string
+          estado: Database["public"]["Enums"]["diagnostic_status"]
+          id: string
+          nombre: string
+          nombre_proyecto: string
+          progreso: number
+          resume_token: string
+          rol_proyecto: string
+          session_key: string
+          submitted_at: string | null
+          telefono: string | null
+          updated_at: string
+        }
+        Insert: {
+          apellido: string
+          created_at?: string
+          email: string
+          estado?: Database["public"]["Enums"]["diagnostic_status"]
+          id?: string
+          nombre: string
+          nombre_proyecto: string
+          progreso?: number
+          resume_token?: string
+          rol_proyecto: string
+          session_key: string
+          submitted_at?: string | null
+          telefono?: string | null
+          updated_at?: string
+        }
+        Update: {
+          apellido?: string
+          created_at?: string
+          email?: string
+          estado?: Database["public"]["Enums"]["diagnostic_status"]
+          id?: string
+          nombre?: string
+          nombre_proyecto?: string
+          progreso?: number
+          resume_token?: string
+          rol_proyecto?: string
+          session_key?: string
+          submitted_at?: string | null
+          telefono?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       relevamientos: {
         Row: {
           acepta_contacto: boolean
@@ -232,6 +394,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      diagnostic_add_file: {
+        Args: {
+          p_file_name: string
+          p_resume_token: string
+          p_session_key: string
+          p_storage_path: string
+          p_tipo: string
+        }
+        Returns: Json
+      }
+      diagnostic_resume: { Args: { p_resume_token: string }; Returns: Json }
+      diagnostic_save_step: {
+        Args: {
+          p_answers: Json
+          p_progreso: number
+          p_resume_token: string
+          p_session_key: string
+          p_step: number
+        }
+        Returns: Json
+      }
+      diagnostic_start: {
+        Args: {
+          p_apellido: string
+          p_email: string
+          p_nombre: string
+          p_nombre_proyecto: string
+          p_rol_proyecto: string
+          p_session_key: string
+          p_telefono: string
+        }
+        Returns: Json
+      }
+      diagnostic_submit: {
+        Args: { p_resume_token: string; p_session_key: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -242,6 +441,7 @@ export type Database = {
     }
     Enums: {
       app_role: "superadmin" | "admin" | "user"
+      diagnostic_status: "V" | "P" | "A"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -370,6 +570,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["superadmin", "admin", "user"],
+      diagnostic_status: ["V", "P", "A"],
     },
   },
 } as const

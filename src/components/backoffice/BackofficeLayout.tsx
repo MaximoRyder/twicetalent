@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, FileText, ClipboardList } from "lucide-react";
+import { LogOut, FileText, ClipboardList, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function BackofficeLayout({ children }: { children: React.ReactNode }) {
@@ -15,7 +15,9 @@ export default function BackofficeLayout({ children }: { children: React.ReactNo
   const navItems = [
     { to: "/backoffice/solicitudes", label: "Solicitudes", icon: FileText },
     { to: "/backoffice/relevamientos", label: "Relevamientos", icon: ClipboardList },
+    { to: "/admin/diagnosticos", label: "Diagnósticos", icon: Stethoscope },
   ];
+
 
   return (
     <div className="min-h-screen bg-background text-foreground flex">
