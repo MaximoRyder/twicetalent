@@ -766,25 +766,6 @@ const Diagnostico = () => {
                 </div>
               </div>
 
-              {resumeLink && (
-                <div className="mt-6 border border-accent/40 bg-accent/5 p-4">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-accent font-['Space_Grotesk'] mb-2">
-                    {t("diagnostico.later.title")}
-                  </p>
-                  <p className="text-xs text-muted-foreground mb-3">{t("diagnostico.later.body")}</p>
-                  <p className="text-xs text-foreground break-all font-mono mb-3">{resumeLink}</p>
-                  <AppButton
-                    variant="secondary"
-                    iconLeft="Copy"
-                    onClick={() => {
-                      navigator.clipboard?.writeText(resumeLink);
-                      toast.success(t("diagnostico.later.copied"));
-                    }}
-                  >
-                    {t("diagnostico.later.copy")}
-                  </AppButton>
-                </div>
-              )}
             </motion.div>
           </AnimatePresence>
         </section>
