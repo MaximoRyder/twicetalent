@@ -747,15 +747,6 @@ const Diagnostico = () => {
                 )}
                 <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
                   <AppButton
-                    variant="secondary"
-                    iconLeft="Clock"
-                    onClick={handleLater}
-                    disabled={busy}
-                    className="w-full sm:w-auto"
-                  >
-                    {t("diagnostico.later")}
-                  </AppButton>
-                  <AppButton
                     onClick={goNext}
                     loading={busy}
                     iconRight={step === TOTAL_STEPS - 1 ? "Check" : "ArrowRight"}
