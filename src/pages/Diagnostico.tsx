@@ -429,6 +429,88 @@ const Diagnostico = () => {
     [missingForStep]
   );
 
+  const labelForCode = (code: string, stepIndex: number): string => {
+    if (stepIndex === 0) {
+      const map: Record<string, string> = {
+        nombre: t("diagnostico.field.nombre"),
+        apellido: t("diagnostico.field.apellido"),
+        rol_proyecto: t("diagnostico.field.rol"),
+        email: t("diagnostico.field.email"),
+        nombre_proyecto: t("diagnostico.field.proyecto"),
+      };
+      return map[code] || code;
+    }
+    const q = STEPS[stepIndex].questions.find((x) => x.code === code);
+    return q?.label || code;
+  };
+
+  const incompleteSummary = useMemo(() => allMissingByStep(), [allMissingByStep]);
+
+  const SummaryPanel = () => {
+    if (!showSummary || incompleteSummary.length === 0) return null;
+    return (
+      <div className="bg-card border-y border-border">
+        <div className="px-5 sm:px-8 lg:px-16 py-5 max-w-6xl mx-auto">
+          <div className="flex items-start gap-3 mb-4">
+            <Icon name="AlertCircle" size={18} className="text-destructive mt-0.5 shrink-0" />
+            <div>
+              <h2 className="text-sm font-['Space_Grotesk'] font-medium text-foreground">
+                Faltan campos por completar
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Hacé clic en un bloque o campo para ir directamente a completarlo.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowSummary(false)}
+              className="ml-auto text-xs text-muted-foreground hover:text-foreground uppercase tracking-widest"
+            >
+              Cerrar
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {incompleteSummary.map((x) => (
+              <div
+                key={x.key}
+                className="border border-border bg-background p-4"
+              >
+                <button
+                  type="button"
+                  onClick={() => goToStep(x.i)}
+                  className="w-full text-left flex items-center gap-2 mb-2 group"
+                >
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-accent font-['Space_Grotesk']">
+                    {x.i === 0 ? "Bloque 01" : STEPS[x.i].eyebrow}
+                  </span>
+                  <span className="text-sm font-medium text-foreground group-hover:text-accent transition-colors">
+                    {x.title}
+                  </span>
+                  <Icon name="ArrowRight" size={12} className="text-muted-foreground ml-auto" />
+                </button>
+                <ul className="space-y-1.5">
+                  {x.missing.map((c) => (
+                    <li key={c}>
+                      <button
+                        type="button"
+                        onClick={() => goToStep(x.i)}
+                        className="text-xs text-destructive hover:text-foreground text-left underline underline-offset-2 decoration-destructive/50 hover:decoration-transparent transition-colors"
+                      >
+                        {labelForCode(c, x.i)}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+
+
 
   if (done) {
     return (
