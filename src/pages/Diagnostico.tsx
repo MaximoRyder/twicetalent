@@ -158,32 +158,6 @@ const Diagnostico = () => {
   const [uploading, setUploading] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [ref, setRef] = useState<string | null>(null);
-  const [resumeLink, setResumeLink] = useState<string | null>(null);
-
-  /** Guarda lo cargado y devuelve el link para retomar (estado P) */
-  const handleLater = async () => {
-    setBusy(true);
-    try {
-      const s = await ensureSession();
-      if (!s) {
-        toast.error(t("diagnostico.later.needContact"));
-        setStep(0);
-        return;
-      }
-      await saveStep(
-        sessionKey,
-        s.resume_token,
-        Math.max(step, 1),
-        answersForStep(STEPS[Math.max(step, 1)].questions),
-        progressForStep(step)
-      );
-      setResumeLink(`${window.location.origin}/diagnostico?r=${s.resume_token}`);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
-    } finally {
-      setBusy(false);
-    }
-  };
 
   useEffect(() => {
     document.title = t("diagnostico.meta.title");
