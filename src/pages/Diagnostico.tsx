@@ -680,7 +680,10 @@ const Diagnostico = () => {
                       <FieldLabel required>{t("diagnostico.field.apellido")}</FieldLabel>
                       <TextField
                         value={contact.apellido}
-                        onChange={(v) => setContact({ ...contact, apellido: v })}
+                        onChange={(v) => {
+                          setContact({ ...contact, apellido: v });
+                          setErrors((e) => ({ ...e, apellido: "" }));
+                        }}
                         error={errors.apellido}
                         maxLength={100}
                         placeholder="Fernández"
