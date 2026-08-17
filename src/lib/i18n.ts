@@ -47,9 +47,9 @@ const es: Dict = {
   "diagnostico.field.telefono": "Teléfono",
   "diagnostico.field.proyecto": "Nombre del proyecto",
 
-  "diagnostico.done.title": "Diagnóstico recibido",
+  "diagnostico.done.title": "Recibimos la información",
   "diagnostico.done.body":
-    "Ya tenemos tu información. Revisamos cada caso a mano y respondemos dentro de las 48 horas hábiles.",
+    "En los próximos días presentamos un diagnóstico con las prioridades detectadas y las opciones de trabajo por etapas.",
   "diagnostico.done.ref": "Referencia",
   "diagnostico.done.home": "Volver al inicio",
 
