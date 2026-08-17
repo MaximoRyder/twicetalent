@@ -294,11 +294,13 @@ const Diagnostico = () => {
         if (!contact.nombre_proyecto.trim()) m.push("nombre_proyecto");
         return m;
       }
+      // Todo campo visible es obligatorio, salvo los adjuntos
       return STEPS[index].questions
-        .filter((q) => q.required)
+        .filter((q) => q.type !== "file" && q.type !== "files")
+        .filter(isVisible)
         .filter((q) => {
           const v = answers[q.code];
-          return Array.isArray(v) ? v.length === 0 : !v;
+          return Array.isArray(v) ? v.length === 0 : !String(v ?? "").trim();
         })
         .map((q) => q.code);
     },
