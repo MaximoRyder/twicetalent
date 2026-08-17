@@ -653,6 +653,24 @@ const Diagnostico = () => {
         </div>
       </header>
 
+      {recovered && (
+        <div className="bg-accent/10 border-b border-accent/40">
+          <div className="px-5 sm:px-8 lg:px-16 py-3 max-w-6xl mx-auto flex items-start gap-3">
+            <Icon name="History" size={16} className="text-accent mt-0.5 shrink-0" />
+            <p className="text-xs sm:text-sm text-foreground break-words">
+              {t("diagnostico.recovered")}
+            </p>
+            <button
+              type="button"
+              onClick={() => setRecovered(false)}
+              className="ml-auto text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground shrink-0"
+            >
+              {t("diagnostico.later.close")}
+            </button>
+          </div>
+        </div>
+      )}
+
       <SummaryPanel />
 
       <div className="px-5 sm:px-8 lg:px-16 py-10 lg:py-16 max-w-6xl mx-auto lg:grid lg:grid-cols-12 lg:gap-12">
