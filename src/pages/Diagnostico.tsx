@@ -792,14 +792,21 @@ const Diagnostico = () => {
                       )}
 
                       {q.type === "textarea" && (
-                        <textarea
-                          value={(answers[q.code] as string) ?? ""}
-                          maxLength={q.maxLength}
-                          placeholder={q.placeholder}
-                          onChange={(e) => setAnswer(q.code, e.target.value)}
-                          rows={4}
-                          className="w-full bg-background border border-border focus:border-accent px-4 py-3 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors resize-y"
-                        />
+                        <>
+                          <textarea
+                            value={(answers[q.code] as string) ?? ""}
+                            maxLength={q.maxLength}
+                            placeholder={q.placeholder}
+                            onChange={(e) => setAnswer(q.code, e.target.value)}
+                            rows={4}
+                            className={`w-full bg-background border px-4 py-3 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors resize-y ${
+                              errors[q.code] ? "border-destructive" : "border-border focus:border-accent"
+                            }`}
+                          />
+                          {errors[q.code] && (
+                            <p className="text-xs text-destructive mt-1.5">{errors[q.code]}</p>
+                          )}
+                        </>
                       )}
 
                       {(q.type === "text" || q.type === "number") && (
