@@ -437,34 +437,55 @@ const Diagnostico = () => {
             <ol className="flex lg:block gap-3 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-5 px-5 lg:mx-0 lg:px-0">
               {stepList.map((s) => {
                 const active = s.index === step;
-                const passed = s.index < step;
+                const complete = s.complete;
                 return (
                   <li
                     key={s.key}
-                    className="flex items-center gap-3 shrink-0 lg:py-2.5"
+                    className="shrink-0 lg:py-1"
                     aria-current={active ? "step" : undefined}
                   >
-                    <span
-                      className={`h-7 w-7 shrink-0 rounded-full border flex items-center justify-center text-[10px] font-['Space_Grotesk'] ${
-                        active
-                          ? "border-accent text-accent"
-                          : passed
-                            ? "border-accent bg-accent text-background"
-                            : "border-border text-muted-foreground"
-                      }`}
+                    <button
+                      type="button"
+                      onClick={() => goToStep(s.index)}
+                      disabled={busy}
+                      className="flex items-center gap-3 text-left w-full group disabled:opacity-60"
                     >
-                      {passed ? <Icon name="Check" size={12} strokeWidth={3} /> : s.index + 1}
-                    </span>
-                    <span
-                      className={`text-xs whitespace-nowrap lg:whitespace-normal font-['Space_Grotesk'] ${
-                        active ? "text-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {s.title}
-                    </span>
+                      <span
+                        className={`h-7 w-7 shrink-0 rounded-full border flex items-center justify-center text-[10px] font-['Space_Grotesk'] transition-colors ${
+                          complete
+                            ? active
+                              ? "border-accent bg-accent text-background"
+                              : "border-accent bg-accent/20 text-accent"
+                            : active
+                              ? "border-accent text-accent"
+                              : "border-border text-muted-foreground"
+                        }`}
+                      >
+                        {complete ? (
+                          <Icon name="Check" size={12} strokeWidth={3} />
+                        ) : (
+                          s.index + 1
+                        )}
+                      </span>
+                      <span
+                        className={`text-xs whitespace-nowrap lg:whitespace-normal font-['Space_Grotesk'] flex items-center gap-1.5 ${
+                          active ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                        }`}
+                      >
+                        {s.title}
+                        {!complete && (
+                          <Icon
+                            name="AlertCircle"
+                            size={12}
+                            className="text-muted-foreground/70"
+                          />
+                        )}
+                      </span>
+                    </button>
                   </li>
                 );
               })}
+
             </ol>
           </div>
         </aside>
