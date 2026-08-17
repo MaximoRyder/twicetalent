@@ -983,6 +983,15 @@ const Diagnostico = () => {
                 )}
                 <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
                   <AppButton
+                    variant="secondary"
+                    iconLeft="Link2"
+                    onClick={handleLater}
+                    disabled={busy}
+                    className="w-full sm:w-auto"
+                  >
+                    {t("diagnostico.later")}
+                  </AppButton>
+                  <AppButton
                     onClick={goNext}
                     loading={busy}
                     iconRight={step === TOTAL_STEPS - 1 ? "Check" : "ArrowRight"}
@@ -992,6 +1001,40 @@ const Diagnostico = () => {
                   </AppButton>
                 </div>
               </div>
+
+              {laterOpen && resumeLink && (
+                <div className="mt-6 border border-accent/40 bg-accent/5 p-4 sm:p-5">
+                  <div className="flex items-start gap-3 mb-3">
+                    <Icon name="Link2" size={16} className="text-accent mt-0.5 shrink-0" />
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-['Space_Grotesk'] font-medium text-foreground">
+                        {t("diagnostico.later.title")}
+                      </h3>
+                      <p className="text-xs text-muted-foreground break-words">
+                        {t("diagnostico.later.body")}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setLaterOpen(false)}
+                      className="ml-auto text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground shrink-0"
+                    >
+                      {t("diagnostico.later.close")}
+                    </button>
+                  </div>
+                  <p className="text-xs font-mono text-foreground break-all bg-background border border-border p-3 mb-3">
+                    {resumeLink}
+                  </p>
+                  <AppButton
+                    variant="secondary"
+                    iconLeft="Copy"
+                    onClick={copyResumeLink}
+                    className="w-full sm:w-auto"
+                  >
+                    {t("diagnostico.later.copy")}
+                  </AppButton>
+                </div>
+              )}
 
             </motion.div>
           </AnimatePresence>
