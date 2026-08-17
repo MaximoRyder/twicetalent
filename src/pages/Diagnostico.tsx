@@ -189,29 +189,6 @@ const Diagnostico = () => {
     setAnswer(code, next);
   };
 
-  const validateContact = () => {
-    const e: Record<string, string> = {};
-    if (!contact.nombre.trim()) e.nombre = t("diagnostico.required");
-    if (!contact.apellido.trim()) e.apellido = t("diagnostico.required");
-    if (!contact.rol_proyecto) e.rol_proyecto = t("diagnostico.required");
-    if (!/^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(contact.email.trim()))
-      e.email = t("diagnostico.error.email");
-    if (!contact.nombre_proyecto.trim()) e.nombre_proyecto = t("diagnostico.required");
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
-  const validateStep = (q: Question[]) => {
-    const e: Record<string, string> = {};
-    q.forEach((question) => {
-      if (!question.required) return;
-      const v = answers[question.code];
-      const empty = Array.isArray(v) ? v.length === 0 : !v;
-      if (empty) e[question.code] = t("diagnostico.required");
-    });
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
 
   const answersForStep = (q: Question[]): AnswerPayload[] =>
     q
@@ -246,33 +223,110 @@ const Diagnostico = () => {
     }
   };
 
-  const goNext = async () => {
+  /** Devuelve los codigos faltantes de un paso (0 = contacto) */
+  const missingForStep = useCallback(
+    (index: number): string[] => {
+      if (index === 0) {
+        const m: string[] = [];
+        if (!contact.nombre.trim()) m.push("nombre");
+        if (!contact.apellido.trim()) m.push("apellido");
+        if (!contact.rol_proyecto) m.push("rol_proyecto");
+        if (!/^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(contact.email.trim())) m.push("email");
+        if (!contact.nombre_proyecto.trim()) m.push("nombre_proyecto");
+        return m;
+      }
+      return STEPS[index].questions
+        .filter((q) => q.required)
+        .filter((q) => {
+          const v = answers[q.code];
+          return Array.isArray(v) ? v.length === 0 : !v;
+        })
+        .map((q) => q.code);
+    },
+    [contact, answers]
+  );
+
+  /** Persiste lo que haya del paso actual, sin bloquear la navegacion */
+  const persistCurrent = async (index: number) => {
+    try {
+      if (index === 0) {
+        if (missingForStep(0).length === 0 && !session) {
+          const s = await startDiagnostic(sessionKey, contact);
+          setSession(s);
+        }
+        return;
+      }
+      if (!session) return;
+      await saveStep(
+        sessionKey,
+        session.resume_token,
+        index,
+        answersForStep(STEPS[index].questions),
+        progressForStep(index)
+      );
+    } catch {
+      /* guardado best-effort: no bloquea la navegacion */
+    }
+  };
+
+  const goToStep = async (target: number) => {
+    if (target === step || busy) return;
     setBusy(true);
     try {
-      if (step === 0) {
-        if (!validateContact()) return;
-        const s = await startDiagnostic(sessionKey, contact);
+      await persistCurrent(step);
+      setErrors({});
+      setStep(target);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const goNext = async () => {
+    if (step < TOTAL_STEPS - 1) {
+      await goToStep(step + 1);
+      return;
+    }
+    // ultimo paso: recien aca validamos todo
+    setBusy(true);
+    try {
+      await persistCurrent(step);
+      const incomplete = STEPS.map((_, i) => ({ i, missing: missingForStep(i) })).filter(
+        (x) => x.missing.length > 0
+      );
+      if (incomplete.length > 0) {
+        const first = incomplete[0];
+        const e: Record<string, string> = {};
+        first.missing.forEach((c) => {
+          e[c] = c === "email" ? t("diagnostico.error.email") : t("diagnostico.required");
+        });
+        setErrors(e);
+        setStep(first.i);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        toast.error(
+          `Faltan campos en: ${incomplete.map((x) => STEPS[x.i].title).join(", ")}`
+        );
+        return;
+      }
+      let s = session;
+      if (!s) {
+        s = await startDiagnostic(sessionKey, contact);
         setSession(s);
-        setStep(1);
-      } else {
-        if (!session) throw new Error("Sesión no iniciada");
-        if (!validateStep(current.questions)) return;
+      }
+      // aseguramos todas las respuestas persistidas antes del submit
+      for (let i = 1; i < TOTAL_STEPS; i++) {
         await saveStep(
           sessionKey,
-          session.resume_token,
-          step,
-          answersForStep(current.questions),
-          progressForStep(step)
+          s.resume_token,
+          i,
+          answersForStep(STEPS[i].questions),
+          progressForStep(i)
         );
-        if (step === TOTAL_STEPS - 1) {
-          const res = await submitDiagnostic(sessionKey, session.resume_token);
-          setRef(res.id);
-          setDone(true);
-          localStorage.removeItem(LS_KEY);
-        } else {
-          setStep(step + 1);
-        }
       }
+      const res = await submitDiagnostic(sessionKey, s.resume_token);
+      setRef(res.id);
+      setDone(true);
+      localStorage.removeItem(LS_KEY);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
@@ -287,7 +341,11 @@ const Diagnostico = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const stepList = useMemo(() => STEPS.map((s, i) => ({ ...s, index: i })), []);
+  const stepList = useMemo(
+    () => STEPS.map((s, i) => ({ ...s, index: i, complete: missingForStep(i).length === 0 })),
+    [missingForStep]
+  );
+
 
   if (done) {
     return (
@@ -356,34 +414,55 @@ const Diagnostico = () => {
             <ol className="flex lg:block gap-3 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-5 px-5 lg:mx-0 lg:px-0">
               {stepList.map((s) => {
                 const active = s.index === step;
-                const passed = s.index < step;
+                const complete = s.complete;
                 return (
                   <li
                     key={s.key}
-                    className="flex items-center gap-3 shrink-0 lg:py-2.5"
+                    className="shrink-0 lg:py-1"
                     aria-current={active ? "step" : undefined}
                   >
-                    <span
-                      className={`h-7 w-7 shrink-0 rounded-full border flex items-center justify-center text-[10px] font-['Space_Grotesk'] ${
-                        active
-                          ? "border-accent text-accent"
-                          : passed
-                            ? "border-accent bg-accent text-background"
-                            : "border-border text-muted-foreground"
-                      }`}
+                    <button
+                      type="button"
+                      onClick={() => goToStep(s.index)}
+                      disabled={busy}
+                      className="flex items-center gap-3 text-left w-full group disabled:opacity-60"
                     >
-                      {passed ? <Icon name="Check" size={12} strokeWidth={3} /> : s.index + 1}
-                    </span>
-                    <span
-                      className={`text-xs whitespace-nowrap lg:whitespace-normal font-['Space_Grotesk'] ${
-                        active ? "text-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {s.title}
-                    </span>
+                      <span
+                        className={`h-7 w-7 shrink-0 rounded-full border flex items-center justify-center text-[10px] font-['Space_Grotesk'] transition-colors ${
+                          complete
+                            ? active
+                              ? "border-accent bg-accent text-background"
+                              : "border-accent bg-accent/20 text-accent"
+                            : active
+                              ? "border-accent text-accent"
+                              : "border-border text-muted-foreground"
+                        }`}
+                      >
+                        {complete ? (
+                          <Icon name="Check" size={12} strokeWidth={3} />
+                        ) : (
+                          s.index + 1
+                        )}
+                      </span>
+                      <span
+                        className={`text-xs whitespace-nowrap lg:whitespace-normal font-['Space_Grotesk'] flex items-center gap-1.5 ${
+                          active ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                        }`}
+                      >
+                        {s.title}
+                        {!complete && (
+                          <Icon
+                            name="AlertCircle"
+                            size={12}
+                            className="text-muted-foreground/70"
+                          />
+                        )}
+                      </span>
+                    </button>
                   </li>
                 );
               })}
+
             </ol>
           </div>
         </aside>
