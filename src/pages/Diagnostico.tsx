@@ -159,7 +159,11 @@ const Diagnostico = () => {
   const [done, setDone] = useState(false);
   const [ref, setRef] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
-
+  const [recovered, setRecovered] = useState(false);
+  const [laterOpen, setLaterOpen] = useState(false);
+  const [focusPending, setFocusPending] = useState(false);
+  const dirtyRef = useRef(false);
+  const savingRef = useRef(false);
 
   useEffect(() => {
     document.title = t("diagnostico.meta.title");
@@ -167,13 +171,18 @@ const Diagnostico = () => {
     if (meta) meta.setAttribute("content", t("diagnostico.meta.description"));
   }, []);
 
-  /** Retomar desde link: /diagnostico?r=<resume_token> */
+  /**
+   * Recuperacion de sesion: token de la URL (/diagnostico?r=<token>) o token
+   * persistido en el navegador. El backend es la fuente de verdad.
+   */
   useEffect(() => {
-    const token = new URLSearchParams(window.location.search).get("r");
+    const urlToken = new URLSearchParams(window.location.search).get("r");
+    const token = urlToken ?? bootRef.current.session?.resume_token ?? null;
     if (!token) return;
     (async () => {
       try {
         const d = await resumeDiagnostic(token);
+        if (d.estado !== "P") return;
         setSession({ id: d.id, resume_token: d.resume_token, estado: d.estado });
         setContact({ ...initialContact, ...d.contacto });
         const allQuestions = STEPS.flatMap((s) => s.questions);
@@ -183,7 +192,9 @@ const Diagnostico = () => {
           const raw = a.answer_text ?? a.answer_value ?? "";
           map[a.question_code] = q?.type === "multi" ? raw.split(",").filter(Boolean) : raw;
         });
-        setAnswers((prev) => ({ ...map, ...prev }));
+        setAnswers((prev) => ({ ...prev, ...map }));
+        setRecovered(true);
+        setFocusPending(true);
       } catch {
         /* token invalido: se continua con el estado local */
       }
