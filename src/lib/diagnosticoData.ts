@@ -229,11 +229,13 @@ export const STEPS: Step[] = [
       {
         code: "registro_interesados",
         label: "Cómo se registran hoy los interesados en comprar",
-        type: "radio",
+        help: "Puedes marcar varias opciones.",
+        type: "multi",
         options: [
           { value: "whatsapp", label: "WhatsApp" },
           { value: "excel", label: "Planilla Excel" },
           { value: "correo", label: "Correo" },
+          { value: "crm", label: "CRM" },
           { value: "inmobiliaria", label: "Inmobiliaria externa" },
           { value: "no_se_registran", label: "No se registran" },
         ],

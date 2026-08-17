@@ -158,32 +158,6 @@ const Diagnostico = () => {
   const [uploading, setUploading] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [ref, setRef] = useState<string | null>(null);
-  const [resumeLink, setResumeLink] = useState<string | null>(null);
-
-  /** Guarda lo cargado y devuelve el link para retomar (estado P) */
-  const handleLater = async () => {
-    setBusy(true);
-    try {
-      const s = await ensureSession();
-      if (!s) {
-        toast.error(t("diagnostico.later.needContact"));
-        setStep(0);
-        return;
-      }
-      await saveStep(
-        sessionKey,
-        s.resume_token,
-        Math.max(step, 1),
-        answersForStep(STEPS[Math.max(step, 1)].questions),
-        progressForStep(step)
-      );
-      setResumeLink(`${window.location.origin}/diagnostico?r=${s.resume_token}`);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
-    } finally {
-      setBusy(false);
-    }
-  };
 
   useEffect(() => {
     document.title = t("diagnostico.meta.title");
@@ -228,16 +202,17 @@ const Diagnostico = () => {
     setErrors((e) => ({ ...e, [code]: "" }));
   }, []);
 
+  const EXCLUSIVE = ["ninguno", "ninguna", "nada", "no_se_registran"];
+
   const toggleMulti = (code: string, value: string) => {
     const currentVal = (answers[code] as string[]) ?? [];
-    const next =
-      value === "ninguno" || value === "ninguna"
-        ? currentVal.includes(value)
-          ? []
-          : [value]
-        : currentVal.includes(value)
-          ? currentVal.filter((v) => v !== value)
-          : [...currentVal.filter((v) => v !== "ninguno" && v !== "ninguna"), value];
+    const next = EXCLUSIVE.includes(value)
+      ? currentVal.includes(value)
+        ? []
+        : [value]
+      : currentVal.includes(value)
+        ? currentVal.filter((v) => v !== value)
+        : [...currentVal.filter((v) => !EXCLUSIVE.includes(v)), value];
     setAnswer(code, next);
   };
 
@@ -320,15 +295,17 @@ const Diagnostico = () => {
         if (!contact.nombre_proyecto.trim()) m.push("nombre_proyecto");
         return m;
       }
+      // Todo campo visible es obligatorio, salvo los adjuntos
       return STEPS[index].questions
-        .filter((q) => q.required)
+        .filter((q) => q.type !== "file" && q.type !== "files")
+        .filter(isVisible)
         .filter((q) => {
           const v = answers[q.code];
-          return Array.isArray(v) ? v.length === 0 : !v;
+          return Array.isArray(v) ? v.length === 0 : !String(v ?? "").trim();
         })
         .map((q) => q.code);
     },
-    [contact, answers]
+    [contact, answers, isVisible]
   );
 
   /** Persiste lo que haya del paso actual, sin bloquear la navegacion */
@@ -660,7 +637,9 @@ const Diagnostico = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-8">
                   {current.questions.filter(isVisible).map((q) => (
                     <div key={q.code} className={q.half ? "sm:col-span-1" : "sm:col-span-2"}>
-                      <FieldLabel required={q.required}>{q.label}</FieldLabel>
+                      <FieldLabel required={q.type !== "file" && q.type !== "files"}>
+                        {q.label}
+                      </FieldLabel>
                       {q.help && (
                         <p className="text-xs text-muted-foreground mb-3 -mt-1 break-words">{q.help}</p>
                       )}
@@ -773,15 +752,6 @@ const Diagnostico = () => {
                 )}
                 <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
                   <AppButton
-                    variant="secondary"
-                    iconLeft="Clock"
-                    onClick={handleLater}
-                    disabled={busy}
-                    className="w-full sm:w-auto"
-                  >
-                    {t("diagnostico.later")}
-                  </AppButton>
-                  <AppButton
                     onClick={goNext}
                     loading={busy}
                     iconRight={step === TOTAL_STEPS - 1 ? "Check" : "ArrowRight"}
@@ -792,25 +762,6 @@ const Diagnostico = () => {
                 </div>
               </div>
 
-              {resumeLink && (
-                <div className="mt-6 border border-accent/40 bg-accent/5 p-4">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-accent font-['Space_Grotesk'] mb-2">
-                    {t("diagnostico.later.title")}
-                  </p>
-                  <p className="text-xs text-muted-foreground mb-3">{t("diagnostico.later.body")}</p>
-                  <p className="text-xs text-foreground break-all font-mono mb-3">{resumeLink}</p>
-                  <AppButton
-                    variant="secondary"
-                    iconLeft="Copy"
-                    onClick={() => {
-                      navigator.clipboard?.writeText(resumeLink);
-                      toast.success(t("diagnostico.later.copied"));
-                    }}
-                  >
-                    {t("diagnostico.later.copy")}
-                  </AppButton>
-                </div>
-              )}
             </motion.div>
           </AnimatePresence>
         </section>
