@@ -717,7 +717,10 @@ const Diagnostico = () => {
                       <TextField
                         type="email"
                         value={contact.email}
-                        onChange={(v) => setContact({ ...contact, email: v })}
+                        onChange={(v) => {
+                          setContact({ ...contact, email: v });
+                          setErrors((e) => ({ ...e, email: "" }));
+                        }}
                         error={errors.email}
                         maxLength={255}
                         placeholder="nombre@empresa.com"
