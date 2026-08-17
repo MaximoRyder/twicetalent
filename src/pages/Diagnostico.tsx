@@ -205,18 +205,29 @@ const Diagnostico = () => {
       })
       .filter(Boolean) as AnswerPayload[];
 
-  const handleFile = async (question: Question, file: File | null) => {
-    if (!file || !session) return;
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("El archivo supera los 10 MB");
+  const handleFiles = async (question: Question, list: FileList | null) => {
+    if (!list || list.length === 0) return;
+    const s = await ensureSession();
+    if (!s) {
+      toast.error(t("diagnostico.later.needContact"));
       return;
     }
     setUploading(question.code);
     try {
-      const path = await uploadDiagnosticFile(session.id, question.fileTipo!, file);
-      await addFileRecord(sessionKey, session.resume_token, question.fileTipo!, path, file.name);
-      setFiles((f) => ({ ...f, [question.code]: { name: file.name, path } }));
-      toast.success("Archivo adjuntado");
+      for (const file of Array.from(list)) {
+        if (file.size > MAX_FILE_MB * 1024 * 1024) {
+          toast.error(t("diagnostico.file.max"));
+          continue;
+        }
+        const path = await uploadDiagnosticFile(s.id, question.fileTipo!, file);
+        await addFileRecord(sessionKey, s.resume_token, question.fileTipo!, path, file.name);
+        setFiles((f) => {
+          const prev = f[question.code] ?? [];
+          const next = question.multiple ? [...prev, { name: file.name, path }] : [{ name: file.name, path }];
+          return { ...f, [question.code]: next };
+        });
+      }
+      toast.success(t("diagnostico.file.attached"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
     } finally {
