@@ -362,6 +362,52 @@ const Diagnostico = () => {
     }
   };
 
+  /** Cambios pendientes de sincronizar con el backend */
+  useEffect(() => {
+    dirtyRef.current = true;
+  }, [answers, contact]);
+
+  /** Bloque 1 completo: se crea el registro (estado P) y su token de sesion */
+  useEffect(() => {
+    if (done || session || savingRef.current) return;
+    if (missingForStep(0).length > 0) return;
+    savingRef.current = true;
+    startDiagnostic(sessionKey, contact)
+      .then(setSession)
+      .catch(() => undefined)
+      .finally(() => {
+        savingRef.current = false;
+      });
+  }, [contact, session, done, sessionKey, missingForStep]);
+
+  /** Autoguardado cada 20 segundos si hubo cambios */
+  useEffect(() => {
+    if (done) return;
+    const id = window.setInterval(async () => {
+      if (!dirtyRef.current || savingRef.current) return;
+      savingRef.current = true;
+      dirtyRef.current = false;
+      try {
+        await persistCurrent(0);
+        if (step > 0) await persistCurrent(step);
+      } catch {
+        dirtyRef.current = true;
+      } finally {
+        savingRef.current = false;
+      }
+    }, 20000);
+    return () => window.clearInterval(id);
+  });
+
+  /** Al recuperar sesion, posicionar en el primer bloque incompleto */
+  useEffect(() => {
+    if (!focusPending) return;
+    const first = STEPS.findIndex((_, i) => missingForStep(i).length > 0);
+    setStep(first === -1 ? TOTAL_STEPS - 1 : first);
+    setFocusPending(false);
+  }, [focusPending, missingForStep]);
+
+
   const goToStep = async (target: number) => {
     if (target === step || busy) return;
     setBusy(true);
