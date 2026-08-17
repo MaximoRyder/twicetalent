@@ -7,6 +7,9 @@ import Index from "./pages/Index";
 import Method from "./pages/Method";
 import Relevamiento from "./pages/Relevamiento";
 import Gracias from "./pages/Gracias";
+import Diagnostico from "./pages/Diagnostico";
+import DiagnosticosList from "./pages/admin/DiagnosticosList";
+
 import BackofficeLogin from "./pages/backoffice/BackofficeLogin";
 import BackofficeSolicitudes from "./pages/backoffice/BackofficeSolicitudes";
 import BackofficeRelevamientos from "./pages/backoffice/BackofficeRelevamientos";
@@ -26,6 +29,9 @@ const App = () => (
           <Route path="/method" element={<Method />} />
           <Route path="/relevamiento" element={<Relevamiento />} />
           <Route path="/relevamiento/gracias" element={<Gracias />} />
+          <Route path="/diagnostico" element={<Diagnostico />} />
+          <Route path="/admin/diagnosticos" element={<DiagnosticosList />} />
+
           <Route path="/backoffice" element={<Navigate to="/backoffice/solicitudes" replace />} />
           <Route path="/backoffice/login" element={<BackofficeLogin />} />
           <Route path="/backoffice/solicitudes" element={<BackofficeSolicitudes />} />
