@@ -565,7 +565,10 @@ const Diagnostico = () => {
         </div>
       </header>
 
+      <SummaryPanel />
+
       <div className="px-5 sm:px-8 lg:px-16 py-10 lg:py-16 max-w-6xl mx-auto lg:grid lg:grid-cols-12 lg:gap-12">
+
         {/* stepper: horizontal en mobile, lateral en desktop */}
         <aside className="lg:col-span-4 mb-10 lg:mb-0">
           <div className="lg:sticky lg:top-28">
