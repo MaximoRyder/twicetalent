@@ -158,6 +158,8 @@ const Diagnostico = () => {
   const [uploading, setUploading] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [ref, setRef] = useState<string | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
+
 
   useEffect(() => {
     document.title = t("diagnostico.meta.title");
@@ -308,7 +310,25 @@ const Diagnostico = () => {
     [contact, answers, isVisible]
   );
 
-  /** Persiste lo que haya del paso actual, sin bloquear la navegacion */
+  const allMissingByStep = useCallback(() => {
+    return STEPS.map((s, i) => ({
+      i,
+      key: s.key,
+      title: s.title,
+      missing: missingForStep(i),
+    })).filter((x) => x.missing.length > 0);
+  }, [missingForStep]);
+
+  const buildAllErrors = (): Record<string, string> => {
+    const e: Record<string, string> = {};
+    allMissingByStep().forEach((x) => {
+      x.missing.forEach((c) => {
+        e[c] = c === "email" ? t("diagnostico.error.email") : t("diagnostico.required");
+      });
+    });
+    return e;
+  };
+
   const persistCurrent = async (index: number) => {
     try {
       if (index === 0) {
@@ -336,7 +356,11 @@ const Diagnostico = () => {
     setBusy(true);
     try {
       await persistCurrent(step);
-      setErrors({});
+      setErrors((prev) => {
+        // mantener errores globales si el resumen esta activo, limpiar solo el del campo seleccionado
+        if (showSummary) return prev;
+        return {};
+      });
       setStep(target);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
@@ -349,25 +373,18 @@ const Diagnostico = () => {
       await goToStep(step + 1);
       return;
     }
-    // ultimo paso: recien aca validamos todo
+    // ultimo paso: validamos todo
     setBusy(true);
     try {
       await persistCurrent(step);
-      const incomplete = STEPS.map((_, i) => ({ i, missing: missingForStep(i) })).filter(
-        (x) => x.missing.length > 0
-      );
+      const incomplete = allMissingByStep();
       if (incomplete.length > 0) {
-        const first = incomplete[0];
-        const e: Record<string, string> = {};
-        first.missing.forEach((c) => {
-          e[c] = c === "email" ? t("diagnostico.error.email") : t("diagnostico.required");
-        });
+        const e = buildAllErrors();
         setErrors(e);
-        setStep(first.i);
+        setShowSummary(true);
+        setStep(0);
         window.scrollTo({ top: 0, behavior: "smooth" });
-        toast.error(
-          `Faltan campos en: ${incomplete.map((x) => STEPS[x.i].title).join(", ")}`
-        );
+        toast.error(`Faltan ${incomplete.reduce((acc, x) => acc + x.missing.length, 0)} campos por completar`);
         return;
       }
       let s = session;
@@ -398,15 +415,101 @@ const Diagnostico = () => {
   };
 
   const goBack = () => {
-    setErrors({});
+    setErrors((prev) => {
+      if (showSummary) return prev;
+      return {};
+    });
     setStep((s) => Math.max(0, s - 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
 
   const stepList = useMemo(
     () => STEPS.map((s, i) => ({ ...s, index: i, complete: missingForStep(i).length === 0 })),
     [missingForStep]
   );
+
+  const labelForCode = (code: string, stepIndex: number): string => {
+    if (stepIndex === 0) {
+      const map: Record<string, string> = {
+        nombre: t("diagnostico.field.nombre"),
+        apellido: t("diagnostico.field.apellido"),
+        rol_proyecto: t("diagnostico.field.rol"),
+        email: t("diagnostico.field.email"),
+        nombre_proyecto: t("diagnostico.field.proyecto"),
+      };
+      return map[code] || code;
+    }
+    const q = STEPS[stepIndex].questions.find((x) => x.code === code);
+    return q?.label || code;
+  };
+
+  const incompleteSummary = useMemo(() => allMissingByStep(), [allMissingByStep]);
+
+  const SummaryPanel = () => {
+    if (!showSummary || incompleteSummary.length === 0) return null;
+    return (
+      <div className="bg-card border-y border-border">
+        <div className="px-5 sm:px-8 lg:px-16 py-5 max-w-6xl mx-auto">
+          <div className="flex items-start gap-3 mb-4">
+            <Icon name="AlertCircle" size={18} className="text-destructive mt-0.5 shrink-0" />
+            <div>
+              <h2 className="text-sm font-['Space_Grotesk'] font-medium text-foreground">
+                Faltan campos por completar
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Hacé clic en un bloque o campo para ir directamente a completarlo.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowSummary(false)}
+              className="ml-auto text-xs text-muted-foreground hover:text-foreground uppercase tracking-widest"
+            >
+              Cerrar
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {incompleteSummary.map((x) => (
+              <div
+                key={x.key}
+                className="border border-border bg-background p-4"
+              >
+                <button
+                  type="button"
+                  onClick={() => goToStep(x.i)}
+                  className="w-full text-left flex items-center gap-2 mb-2 group"
+                >
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-accent font-['Space_Grotesk']">
+                    {x.i === 0 ? "Bloque 01" : STEPS[x.i].eyebrow}
+                  </span>
+                  <span className="text-sm font-medium text-foreground group-hover:text-accent transition-colors">
+                    {x.title}
+                  </span>
+                  <Icon name="ArrowRight" size={12} className="text-muted-foreground ml-auto" />
+                </button>
+                <ul className="space-y-1.5">
+                  {x.missing.map((c) => (
+                    <li key={c}>
+                      <button
+                        type="button"
+                        onClick={() => goToStep(x.i)}
+                        className="text-xs text-destructive hover:text-foreground text-left underline underline-offset-2 decoration-destructive/50 hover:decoration-transparent transition-colors"
+                      >
+                        {labelForCode(c, x.i)}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+
 
 
   if (done) {
@@ -462,7 +565,10 @@ const Diagnostico = () => {
         </div>
       </header>
 
+      <SummaryPanel />
+
       <div className="px-5 sm:px-8 lg:px-16 py-10 lg:py-16 max-w-6xl mx-auto lg:grid lg:grid-cols-12 lg:gap-12">
+
         {/* stepper: horizontal en mobile, lateral en desktop */}
         <aside className="lg:col-span-4 mb-10 lg:mb-0">
           <div className="lg:sticky lg:top-28">
@@ -561,7 +667,10 @@ const Diagnostico = () => {
                       <FieldLabel required>{t("diagnostico.field.nombre")}</FieldLabel>
                       <TextField
                         value={contact.nombre}
-                        onChange={(v) => setContact({ ...contact, nombre: v })}
+                        onChange={(v) => {
+                          setContact({ ...contact, nombre: v });
+                          setErrors((e) => ({ ...e, nombre: "" }));
+                        }}
                         error={errors.nombre}
                         maxLength={100}
                         placeholder="Martina"
@@ -571,7 +680,10 @@ const Diagnostico = () => {
                       <FieldLabel required>{t("diagnostico.field.apellido")}</FieldLabel>
                       <TextField
                         value={contact.apellido}
-                        onChange={(v) => setContact({ ...contact, apellido: v })}
+                        onChange={(v) => {
+                          setContact({ ...contact, apellido: v });
+                          setErrors((e) => ({ ...e, apellido: "" }));
+                        }}
                         error={errors.apellido}
                         maxLength={100}
                         placeholder="Fernández"
@@ -605,7 +717,10 @@ const Diagnostico = () => {
                       <TextField
                         type="email"
                         value={contact.email}
-                        onChange={(v) => setContact({ ...contact, email: v })}
+                        onChange={(v) => {
+                          setContact({ ...contact, email: v });
+                          setErrors((e) => ({ ...e, email: "" }));
+                        }}
                         error={errors.email}
                         maxLength={255}
                         placeholder="nombre@empresa.com"
@@ -626,7 +741,10 @@ const Diagnostico = () => {
                     <FieldLabel required>{t("diagnostico.field.proyecto")}</FieldLabel>
                     <TextField
                       value={contact.nombre_proyecto}
-                      onChange={(v) => setContact({ ...contact, nombre_proyecto: v })}
+                      onChange={(v) => {
+                        setContact({ ...contact, nombre_proyecto: v });
+                        setErrors((e) => ({ ...e, nombre_proyecto: "" }));
+                      }}
                       error={errors.nombre_proyecto}
                       maxLength={150}
                       placeholder="Nombre comercial o de trabajo"
@@ -674,14 +792,21 @@ const Diagnostico = () => {
                       )}
 
                       {q.type === "textarea" && (
-                        <textarea
-                          value={(answers[q.code] as string) ?? ""}
-                          maxLength={q.maxLength}
-                          placeholder={q.placeholder}
-                          onChange={(e) => setAnswer(q.code, e.target.value)}
-                          rows={4}
-                          className="w-full bg-background border border-border focus:border-accent px-4 py-3 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors resize-y"
-                        />
+                        <>
+                          <textarea
+                            value={(answers[q.code] as string) ?? ""}
+                            maxLength={q.maxLength}
+                            placeholder={q.placeholder}
+                            onChange={(e) => setAnswer(q.code, e.target.value)}
+                            rows={4}
+                            className={`w-full bg-background border px-4 py-3 text-sm text-foreground font-['Space_Grotesk'] placeholder:text-muted-foreground/50 focus:outline-none transition-colors resize-y ${
+                              errors[q.code] ? "border-destructive" : "border-border focus:border-accent"
+                            }`}
+                          />
+                          {errors[q.code] && (
+                            <p className="text-xs text-destructive mt-1.5">{errors[q.code]}</p>
+                          )}
+                        </>
                       )}
 
                       {(q.type === "text" || q.type === "number") && (
