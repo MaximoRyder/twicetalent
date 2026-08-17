@@ -741,7 +741,10 @@ const Diagnostico = () => {
                     <FieldLabel required>{t("diagnostico.field.proyecto")}</FieldLabel>
                     <TextField
                       value={contact.nombre_proyecto}
-                      onChange={(v) => setContact({ ...contact, nombre_proyecto: v })}
+                      onChange={(v) => {
+                        setContact({ ...contact, nombre_proyecto: v });
+                        setErrors((e) => ({ ...e, nombre_proyecto: "" }));
+                      }}
                       error={errors.nombre_proyecto}
                       maxLength={150}
                       placeholder="Nombre comercial o de trabajo"
