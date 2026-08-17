@@ -190,6 +190,27 @@ const Diagnostico = () => {
     if (meta) meta.setAttribute("content", t("diagnostico.meta.description"));
   }, []);
 
+  /** Retomar desde link: /diagnostico?r=<resume_token> */
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("r");
+    if (!token) return;
+    (async () => {
+      try {
+        const d = await resumeDiagnostic(token);
+        setSession({ id: d.id, resume_token: d.resume_token, estado: d.estado });
+        setContact({ ...initialContact, ...d.contacto });
+        const map: AnswerMap = {};
+        d.answers.forEach((a) => {
+          const raw = a.answer_text ?? a.answer_value ?? "";
+          map[a.question_code] = raw.includes(",") ? raw.split(",") : raw;
+        });
+        setAnswers((prev) => ({ ...map, ...prev }));
+      } catch {
+        /* token invalido: se continua con el estado local */
+      }
+    })();
+  }, []);
+
   useEffect(() => {
     if (done) return;
     const payload: Persisted = { sessionKey, session, contact, answers, files, step };
