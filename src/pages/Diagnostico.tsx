@@ -10,6 +10,7 @@ import {
   STEPS,
   TOTAL_STEPS,
   ROLES_PROYECTO,
+  MAX_FILE_MB,
   initialContact,
   progressForStep,
   type ContactState,
