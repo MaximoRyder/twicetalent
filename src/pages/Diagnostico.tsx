@@ -192,16 +192,29 @@ const Diagnostico = () => {
   };
 
 
+  /** Una pregunta condicional solo cuenta si su condicion se cumple */
+  const isVisible = useCallback(
+    (question: Question) => {
+      if (!question.showIf) return true;
+      const v = answers[question.showIf.code];
+      const val = Array.isArray(v) ? v : [v ?? ""];
+      return val.some((x) => question.showIf!.values.includes(String(x)));
+    },
+    [answers]
+  );
+
   const answersForStep = (q: Question[]): AnswerPayload[] =>
     q
-      .filter((question) => question.type !== "file")
+      .filter((question) => question.type !== "file" && question.type !== "files")
+      .filter(isVisible)
       .map((question) => {
         const v = answers[question.code];
-        if (v === undefined) return null;
+        if (v === undefined || v === "") return null;
         return {
           question_code: question.code,
           answer_value: Array.isArray(v) ? v.join(",") : v,
-          answer_text: question.type === "textarea" || question.type === "text" ? String(v) : null,
+          answer_text:
+            question.type === "textarea" || question.type === "text" ? String(v) : null,
         };
       })
       .filter(Boolean) as AnswerPayload[];
