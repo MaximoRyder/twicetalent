@@ -471,6 +471,37 @@ const Diagnostico = () => {
     }
   };
 
+  const resumeLink = session
+    ? `${window.location.origin}/diagnostico?r=${session.resume_token}`
+    : "";
+
+  const handleLater = async () => {
+    setBusy(true);
+    try {
+      const s = await ensureSession();
+      if (!s) {
+        toast.error(t("diagnostico.later.needContact"));
+        return;
+      }
+      await persistCurrent(step);
+      dirtyRef.current = false;
+      setLaterOpen(true);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const copyResumeLink = async () => {
+    try {
+      await navigator.clipboard.writeText(resumeLink);
+      toast.success(t("diagnostico.later.copied"));
+    } catch {
+      toast.error(t("diagnostico.error.generic"));
+    }
+  };
+
   const goBack = () => {
     setErrors((prev) => {
       if (showSummary) return prev;
