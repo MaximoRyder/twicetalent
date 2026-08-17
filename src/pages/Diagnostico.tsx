@@ -27,7 +27,7 @@ import {
   type AnswerPayload,
 } from "@/lib/diagnosticoApi";
 
-const LS_KEY = "tt_diagnostico_v1";
+const LS_KEY = "tt_diagnostico_v2";
 const easing = [0.16, 1, 0.3, 1] as const;
 
 type AnswerMap = Record<string, string | string[]>;
