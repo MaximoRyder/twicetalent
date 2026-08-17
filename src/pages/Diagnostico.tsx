@@ -22,6 +22,7 @@ import {
   submitDiagnostic,
   uploadDiagnosticFile,
   addFileRecord,
+  resumeDiagnostic,
   type DiagnosticSession,
   type AnswerPayload,
 } from "@/lib/diagnosticoApi";
