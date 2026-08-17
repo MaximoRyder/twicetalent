@@ -246,33 +246,110 @@ const Diagnostico = () => {
     }
   };
 
-  const goNext = async () => {
+  /** Devuelve los codigos faltantes de un paso (0 = contacto) */
+  const missingForStep = useCallback(
+    (index: number): string[] => {
+      if (index === 0) {
+        const m: string[] = [];
+        if (!contact.nombre.trim()) m.push("nombre");
+        if (!contact.apellido.trim()) m.push("apellido");
+        if (!contact.rol_proyecto) m.push("rol_proyecto");
+        if (!/^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(contact.email.trim())) m.push("email");
+        if (!contact.nombre_proyecto.trim()) m.push("nombre_proyecto");
+        return m;
+      }
+      return STEPS[index].questions
+        .filter((q) => q.required)
+        .filter((q) => {
+          const v = answers[q.code];
+          return Array.isArray(v) ? v.length === 0 : !v;
+        })
+        .map((q) => q.code);
+    },
+    [contact, answers]
+  );
+
+  /** Persiste lo que haya del paso actual, sin bloquear la navegacion */
+  const persistCurrent = async (index: number) => {
+    try {
+      if (index === 0) {
+        if (missingForStep(0).length === 0 && !session) {
+          const s = await startDiagnostic(sessionKey, contact);
+          setSession(s);
+        }
+        return;
+      }
+      if (!session) return;
+      await saveStep(
+        sessionKey,
+        session.resume_token,
+        index,
+        answersForStep(STEPS[index].questions),
+        progressForStep(index)
+      );
+    } catch {
+      /* guardado best-effort: no bloquea la navegacion */
+    }
+  };
+
+  const goToStep = async (target: number) => {
+    if (target === step || busy) return;
     setBusy(true);
     try {
-      if (step === 0) {
-        if (!validateContact()) return;
-        const s = await startDiagnostic(sessionKey, contact);
+      await persistCurrent(step);
+      setErrors({});
+      setStep(target);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const goNext = async () => {
+    if (step < TOTAL_STEPS - 1) {
+      await goToStep(step + 1);
+      return;
+    }
+    // ultimo paso: recien aca validamos todo
+    setBusy(true);
+    try {
+      await persistCurrent(step);
+      const incomplete = STEPS.map((_, i) => ({ i, missing: missingForStep(i) })).filter(
+        (x) => x.missing.length > 0
+      );
+      if (incomplete.length > 0) {
+        const first = incomplete[0];
+        const e: Record<string, string> = {};
+        first.missing.forEach((c) => {
+          e[c] = c === "email" ? t("diagnostico.error.email") : t("diagnostico.required");
+        });
+        setErrors(e);
+        setStep(first.i);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        toast.error(
+          `Faltan campos en: ${incomplete.map((x) => STEPS[x.i].title).join(", ")}`
+        );
+        return;
+      }
+      let s = session;
+      if (!s) {
+        s = await startDiagnostic(sessionKey, contact);
         setSession(s);
-        setStep(1);
-      } else {
-        if (!session) throw new Error("Sesión no iniciada");
-        if (!validateStep(current.questions)) return;
+      }
+      // aseguramos todas las respuestas persistidas antes del submit
+      for (let i = 1; i < TOTAL_STEPS; i++) {
         await saveStep(
           sessionKey,
-          session.resume_token,
-          step,
-          answersForStep(current.questions),
-          progressForStep(step)
+          s.resume_token,
+          i,
+          answersForStep(STEPS[i].questions),
+          progressForStep(i)
         );
-        if (step === TOTAL_STEPS - 1) {
-          const res = await submitDiagnostic(sessionKey, session.resume_token);
-          setRef(res.id);
-          setDone(true);
-          localStorage.removeItem(LS_KEY);
-        } else {
-          setStep(step + 1);
-        }
       }
+      const res = await submitDiagnostic(sessionKey, s.resume_token);
+      setRef(res.id);
+      setDone(true);
+      localStorage.removeItem(LS_KEY);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("diagnostico.error.generic"));
@@ -287,7 +364,11 @@ const Diagnostico = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const stepList = useMemo(() => STEPS.map((s, i) => ({ ...s, index: i })), []);
+  const stepList = useMemo(
+    () => STEPS.map((s, i) => ({ ...s, index: i, complete: missingForStep(i).length === 0 })),
+    [missingForStep]
+  );
+
 
   if (done) {
     return (
