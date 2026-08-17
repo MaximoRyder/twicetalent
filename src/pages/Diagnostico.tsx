@@ -29,7 +29,8 @@ const LS_KEY = "tt_diagnostico_v1";
 const easing = [0.16, 1, 0.3, 1] as const;
 
 type AnswerMap = Record<string, string | string[]>;
-type FileMap = Record<string, { name: string; path: string }>;
+type UploadedFile = { name: string; path: string };
+type FileMap = Record<string, UploadedFile[]>;
 
 interface Persisted {
   sessionKey: string;
