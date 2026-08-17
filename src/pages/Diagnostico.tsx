@@ -200,10 +200,12 @@ const Diagnostico = () => {
         const d = await resumeDiagnostic(token);
         setSession({ id: d.id, resume_token: d.resume_token, estado: d.estado });
         setContact({ ...initialContact, ...d.contacto });
+        const allQuestions = STEPS.flatMap((s) => s.questions);
         const map: AnswerMap = {};
         d.answers.forEach((a) => {
+          const q = allQuestions.find((x) => x.code === a.question_code);
           const raw = a.answer_text ?? a.answer_value ?? "";
-          map[a.question_code] = raw.includes(",") ? raw.split(",") : raw;
+          map[a.question_code] = q?.type === "multi" ? raw.split(",").filter(Boolean) : raw;
         });
         setAnswers((prev) => ({ ...map, ...prev }));
       } catch {
