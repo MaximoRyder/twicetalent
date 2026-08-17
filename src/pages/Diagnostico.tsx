@@ -304,7 +304,7 @@ const Diagnostico = () => {
         })
         .map((q) => q.code);
     },
-    [contact, answers]
+    [contact, answers, isVisible]
   );
 
   /** Persiste lo que haya del paso actual, sin bloquear la navegacion */
