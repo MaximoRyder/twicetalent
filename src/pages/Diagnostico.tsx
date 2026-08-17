@@ -202,16 +202,17 @@ const Diagnostico = () => {
     setErrors((e) => ({ ...e, [code]: "" }));
   }, []);
 
+  const EXCLUSIVE = ["ninguno", "ninguna", "nada", "no_se_registran"];
+
   const toggleMulti = (code: string, value: string) => {
     const currentVal = (answers[code] as string[]) ?? [];
-    const next =
-      value === "ninguno" || value === "ninguna"
-        ? currentVal.includes(value)
-          ? []
-          : [value]
-        : currentVal.includes(value)
-          ? currentVal.filter((v) => v !== value)
-          : [...currentVal.filter((v) => v !== "ninguno" && v !== "ninguna"), value];
+    const next = EXCLUSIVE.includes(value)
+      ? currentVal.includes(value)
+        ? []
+        : [value]
+      : currentVal.includes(value)
+        ? currentVal.filter((v) => v !== value)
+        : [...currentVal.filter((v) => !EXCLUSIVE.includes(v)), value];
     setAnswer(code, next);
   };
 
