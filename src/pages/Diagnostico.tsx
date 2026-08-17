@@ -189,29 +189,6 @@ const Diagnostico = () => {
     setAnswer(code, next);
   };
 
-  const validateContact = () => {
-    const e: Record<string, string> = {};
-    if (!contact.nombre.trim()) e.nombre = t("diagnostico.required");
-    if (!contact.apellido.trim()) e.apellido = t("diagnostico.required");
-    if (!contact.rol_proyecto) e.rol_proyecto = t("diagnostico.required");
-    if (!/^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(contact.email.trim()))
-      e.email = t("diagnostico.error.email");
-    if (!contact.nombre_proyecto.trim()) e.nombre_proyecto = t("diagnostico.required");
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
-  const validateStep = (q: Question[]) => {
-    const e: Record<string, string> = {};
-    q.forEach((question) => {
-      if (!question.required) return;
-      const v = answers[question.code];
-      const empty = Array.isArray(v) ? v.length === 0 : !v;
-      if (empty) e[question.code] = t("diagnostico.required");
-    });
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
 
   const answersForStep = (q: Question[]): AnswerPayload[] =>
     q
